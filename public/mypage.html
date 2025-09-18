@@ -11,7 +11,8 @@
       font-family: 'Gowun Dodum', sans-serif;
       background: linear-gradient(to bottom, #e3f2fd, #f8f9fa);
       color: var(--text-color, #000000);
-      padding: 2rem 1rem 100px;
+      padding: 2rem 1rem;
+      padding-top: 90px;
       max-width: 800px;
       margin: auto;
     }
@@ -88,6 +89,35 @@
   </style>
 </head>
 <body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="dashboard.html" class="nav-brand">🌙 한 숨의 위로</a>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">대시보드</a>
+        </li>
+        <li class="nav-item">
+          <a href="write-diary.html" class="nav-link">일기 작성</a>
+        </li>
+        <li class="nav-item">
+          <a href="my-diary.html" class="nav-link">내 일기</a>
+        </li>
+        <li class="nav-item">
+          <a href="anonymous-community.html" class="nav-link">익명 커뮤니티</a>
+        </li>
+        <li class="nav-item">
+          <a href="expert-consultation.html" class="nav-link">전문가 상담</a>
+        </li>
+        <li class="nav-item">
+          <a href="stats.html" class="nav-link">통계</a>
+        </li>
+        <li class="nav-item">
+          <a href="my-page.html" class="nav-link active">마이페이지</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
   <h1>👋 마이페이지</h1>
 
   <div class="section">
@@ -124,10 +154,8 @@
   <script type="module">
     import { supabase } from './js/supabase.js';
     import { checkAuth } from './js/auth.js';
-    import { insertBottomNav } from './js/components/nav.js';
 
     checkAuth();
-    insertBottomNav();
 
     const emailEl = document.getElementById('user-email');
     const notifToggle = document.getElementById('notification-toggle');
@@ -216,6 +244,5 @@
     loadSettings();
   </script>
 
-  <script type="module" src="./js/components/nav.js"></script>
 </body>
 </html>

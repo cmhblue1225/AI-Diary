@@ -11,7 +11,8 @@
     body {
       font-family: 'Gowun Dodum', sans-serif;
       background: linear-gradient(to bottom, #e3f2fd, #f8f9fa);
-      padding: 2rem 1.2rem 100px;
+      padding: 2rem 1.2rem;
+      padding-top: 90px;
       max-width: 700px;
       margin: auto;
     }
@@ -118,6 +119,35 @@
   </style>
 </head>
 <body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="dashboard.html" class="nav-brand">🌙 한 숨의 위로</a>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">대시보드</a>
+        </li>
+        <li class="nav-item">
+          <a href="write-diary.html" class="nav-link">일기 작성</a>
+        </li>
+        <li class="nav-item">
+          <a href="my-diary.html" class="nav-link active">내 일기</a>
+        </li>
+        <li class="nav-item">
+          <a href="anonymous-community.html" class="nav-link">익명 커뮤니티</a>
+        </li>
+        <li class="nav-item">
+          <a href="expert-consultation.html" class="nav-link">전문가 상담</a>
+        </li>
+        <li class="nav-item">
+          <a href="stats.html" class="nav-link">통계</a>
+        </li>
+        <li class="nav-item">
+          <a href="my-page.html" class="nav-link">마이페이지</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
   <header>
     <h1>📘 내 감정 일기</h1>
   </header>
@@ -146,11 +176,9 @@
 
   <script type="module">
     import { supabase } from './js/supabase.js';
-    import { insertBottomNav } from './js/components/nav.js';
     import { checkAuth } from './js/auth.js';
 
     checkAuth();
-    insertBottomNav();
 
     const diaryList = document.getElementById('diary-list');
     const emotionFilter = document.getElementById('emotion-filter');
@@ -238,6 +266,5 @@
     fetchDiaries();
   </script>
 
-  <script type="module" src="./js/components/nav.js"></script>
 </body>
 </html>

@@ -1,9 +1,7 @@
 import { supabase } from './supabase.js';
 import { checkAuth } from './auth.js';
-import { insertBottomNav } from './components/nav.js';
 
 checkAuth();
-insertBottomNav();
 
 const diaryList = document.getElementById('diary-list');
 const emotionFilter = document.getElementById('emotion-filter');

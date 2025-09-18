@@ -323,12 +323,10 @@
   <script type="module">
     import { supabase } from './js/supabase.js';
     import { checkAuth } from './js/auth.js';
-    import { insertBottomNav } from './js/components/nav.js';
     import { MultimodalDiary } from './js/multimodal-diary.js';
     import { EmotionPrediction } from './js/emotion-prediction.js';
 
     checkAuth();
-    insertBottomNav();
 
     // 탭 네비게이션 설정
     const tabBtns = document.querySelectorAll('.tab-btn');

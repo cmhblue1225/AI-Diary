@@ -5,7 +5,6 @@ body {
   color: var(--text-color, #000);
   margin: 0;
   padding: 20px;
-  padding-bottom: 70px; /* ✅ 하단 바 공간 확보 */
   padding-top: 70px; /* 상단 네비게이션 공간 확보 */
 }
 
@@ -343,40 +342,6 @@ button:hover {
   display: block;
 }
 
-/* 하단 네비게이션 바 */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: #ffffff;
-  border-top: 1px solid #ccc;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 0.6rem 0;
-  z-index: 1000;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
-}
-
-.bottom-nav a {
-  flex: 1;
-  text-align: center;
-  text-decoration: none;
-  font-size: 1.7rem;
-  color: #333;
-  transition: color 0.2s ease;
-}
-
-.bottom-nav a:hover {
-  color: #228be6;
-}
-
-.bottom-nav a.active {
-  color: #228be6;
-  font-weight: bold;
-  border-bottom: 2px solid #228be6;
-}
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
@@ -392,9 +357,6 @@ button:hover {
     height: 120px;
   }
 
-  .bottom-nav a {
-    font-size: 1.5rem;
-  }
 }
 
 @media (max-width: 480px) {
@@ -403,9 +365,6 @@ button:hover {
     padding: 0.6rem 1rem;
   }
 
-  .bottom-nav a {
-    font-size: 1.4rem;
-  }
 
   .diary-entry {
     font-size: 0.95rem;
