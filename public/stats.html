@@ -3,258 +3,1095 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>감정 통계</title>
+  <title>AI 감정 분석 대시보드</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: 'Gowun Dodum', sans-serif;
-      padding: 2rem 1rem 100px;
-      max-width: 800px;
+      padding: 1rem 1rem 100px;
+      max-width: 1200px;
       margin: auto;
-      background: linear-gradient(to bottom, #e3f2fd, #f8f9fa);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
     }
 
-    h1, h2, h3 {
+    .dashboard-header {
       text-align: center;
-      margin-top: 2rem;
-      color: #228be6;
+      margin-bottom: 2rem;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
-    #gpt-summary {
-      background: #fff3bf;
-      padding: 1rem;
-      border-radius: 10px;
-      margin-top: 1.5rem;
-      font-size: 1rem;
+    .dashboard-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(45deg, #ff6b9d, #74c0fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .dashboard-header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .dashboard-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #f1f3f5;
+    }
+
+    .card-header h3 {
+      margin: 0;
+      color: #343a40;
+      font-size: 1.3rem;
+    }
+
+    .ai-insights-card {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+    }
+
+    .ai-insights-header {
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .ai-badge {
+      background: rgba(255,255,255,0.2);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .ai-insights-content {
+      font-size: 1.1rem;
       line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .ai-insights-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-ai-detail, .btn-ai-recommend {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid rgba(255,255,255,0.3);
+      padding: 0.8rem 1.2rem;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-ai-detail:hover, .btn-ai-recommend:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .emotion-profile-card {
+      background: linear-gradient(135deg, #74c0fc, #339af0);
+      color: white;
+    }
+
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .total-entries {
+      background: rgba(255,255,255,0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+
+    .emotion-badges {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .emotion-badge {
+      background: rgba(255,255,255,0.2);
+      padding: 0.8rem 1.2rem;
+      border-radius: 25px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .emotion-percentage {
+      font-weight: bold;
+      font-size: 1.1rem;
     }
 
     canvas {
+      background: rgba(255,255,255,0.9);
+      border-radius: 15px;
+      padding: 1rem;
+      margin: 1rem 0;
+      max-height: 400px;
       width: 100% !important;
       height: auto !important;
-      max-height: 400px;
-      margin: 1.5rem 0;
+    }
+
+    .dashboard-card canvas {
+      max-height: 300px;
+    }
+
+    .ai-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .ai-modal {
       background: white;
+      border-radius: 20px;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .ai-modal-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 20px 20px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: background-color 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .ai-modal-body {
+      padding: 2rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.1rem;
+      color: #666;
+    }
+
+    .detailed-analysis {
+      space-y: 1.5rem;
+    }
+
+    .analysis-section {
+      margin-bottom: 2rem;
+    }
+
+    .complexity-meter {
+      width: 100%;
+      height: 10px;
+      background: #f1f3f5;
       border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      overflow: hidden;
+      margin: 0.5rem 0;
+    }
+
+    .meter-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #51cf66, #74c0fc);
+      border-radius: 10px;
+      transition: width 0.3s ease;
+    }
+
+    .keywords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .keyword-tag {
+      background: #e9ecef;
+      color: #495057;
+      padding: 0.3rem 0.8rem;
+      border-radius: 15px;
+      font-size: 0.9rem;
+    }
+
+    .ai-insight, .personalized-advice {
+      background: #f8f9fa;
       padding: 1rem;
+      border-radius: 10px;
+      border-left: 4px solid #74c0fc;
+      line-height: 1.6;
+    }
+
+    .similar-entries {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .similar-entry {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 10px;
+      border-left: 4px solid #51cf66;
+    }
+
+    .entry-date, .entry-emotion {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+
+    .entry-preview {
+      color: #343a40;
+      line-height: 1.4;
+    }
+
+    .recommendations {
+      space-y: 2rem;
+    }
+
+    .recommendation-section {
+      margin-bottom: 2rem;
+    }
+
+    .recommendation-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .recommendation-item {
+      background: #e7f5ff;
+      padding: 1rem;
+      border-radius: 10px;
+      border-left: 4px solid #339af0;
+    }
+
+    .quote-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .quote-item {
+      background: #fff3cd;
+      padding: 1.2rem;
+      border-radius: 10px;
+      border-left: 4px solid #ffc107;
+      font-style: italic;
+      font-size: 1.05rem;
+    }
+
+    .recommendation-actions {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .btn-apply-recommendation {
+      background: linear-gradient(135deg, #51cf66, #37b24d);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 25px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-apply-recommendation:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(55, 178, 77, 0.3);
+    }
+
+    .btn-apply-recommendation:disabled {
+      background: #51cf66;
+      cursor: not-allowed;
+      transform: none;
     }
 
     #no-data {
       text-align: center;
       margin-top: 2rem;
-      color: gray;
+      color: rgba(255,255,255,0.8);
       font-size: 1.1rem;
+      background: rgba(255,255,255,0.1);
+      padding: 2rem;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ai-insights-actions {
+        flex-direction: column;
+      }
+
+      .emotion-badges {
+        flex-direction: column;
+      }
+
+      .dashboard-header h1 {
+        font-size: 2rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>📊 내 감정 통계</h1>
+  <div class="dashboard-header">
+    <h1>🧠 AI 감정 분석 대시보드</h1>
+    <p>GPT-4o가 분석하는 당신의 감정 여정</p>
+  </div>
 
-  <div id="no-data" style="display: none;">일기 데이터가 없습니다.</div>
-  <canvas id="emotionChart" style="display: none;"></canvas>
+  <div id="no-data" style="display: none;">
+    <h2>📝 아직 일기가 없습니다</h2>
+    <p>첫 번째 일기를 작성하여 AI 분석을 시작해보세요!</p>
+    <a href="write-diary.html" style="color: white; text-decoration: underline;">일기 쓰러 가기 →</a>
+  </div>
 
-  <h2>📈 날짜별 감정 흐름</h2>
-  <canvas id="emotionTrendChart"></canvas>
+  <div class="dashboard-grid" id="main-dashboard" style="display: none;">
+    <!-- AI 인사이트 카드 -->
+    <div class="dashboard-card ai-insights-card">
+      <div id="ai-insights-container">
+        <div class="ai-insights-header">
+          <h3>🧠 AI 감정 인사이트</h3>
+          <span class="ai-badge">GPT-4o 분석</span>
+        </div>
+        <div class="ai-insights-content">
+          <div class="loading">AI가 당신의 감정을 분석하고 있습니다...</div>
+        </div>
+      </div>
+    </div>
 
-  <h2>🗓️ 요일별 감정 추이</h2>
-  <canvas id="weeklyEmotionChart"></canvas>
+    <!-- 감정 프로필 카드 -->
+    <div class="dashboard-card emotion-profile-card">
+      <div id="emotion-profile-container">
+        <div class="profile-header">
+          <h3>📊 나의 감정 프로필</h3>
+          <div class="total-entries">분석 중...</div>
+        </div>
+        <div class="loading">감정 데이터를 불러오는 중...</div>
+      </div>
+    </div>
 
-  <h2>📆 시간대별 감정 경향</h2>
-  <canvas id="hourlyEmotionChart"></canvas>
+    <!-- 감정 변화 트렌드 -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3>📈 감정 변화 추세</h3>
+      </div>
+      <canvas id="mood-trend-chart"></canvas>
+    </div>
 
-  <h2>🧠 GPT 감정 주간 분석</h2>
-  <div id="gpt-summary"></div>
+    <!-- 상세 분석 차트 -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3>🎯 감정 분포 분석</h3>
+      </div>
+      <canvas id="emotion-pie-chart"></canvas>
+    </div>
+
+    <!-- 시간대별 감정 패턴 -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3>⏰ 시간대별 감정 패턴</h3>
+      </div>
+      <canvas id="hourly-pattern-chart"></canvas>
+    </div>
+
+    <!-- 요일별 감정 분석 -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3>📅 요일별 감정 분석</h3>
+      </div>
+      <canvas id="weekly-pattern-chart"></canvas>
+    </div>
+  </div>
 
   <script type="module">
     import { supabase } from './js/supabase.js';
     import { checkAuth } from './js/auth.js';
     import { insertBottomNav } from './js/components/nav.js';
+    import { aiDashboard } from './js/ai-dashboard.js';
 
     checkAuth();
     insertBottomNav();
 
+    // AI 대시보드 전역 접근을 위한 설정
+    window.aiDashboard = aiDashboard;
+
+    // 확장된 감정 점수 매핑 (24가지 감정)
     const emotionScores = {
-      happy: 2,
-      neutral: 1,
-      anxious: 0,
-      sad: -1,
-      angry: -2
+      // 긍정 감정
+      joy: 80, contentment: 60, gratitude: 70, love: 85, excitement: 75,
+      pride: 65, hope: 55, relief: 50,
+      // 부정 감정
+      sadness: -60, grief: -80, anger: -70, frustration: -55, anxiety: -65,
+      fear: -75, guilt: -45, shame: -50, loneliness: -60, disappointment: -40,
+      // 중성 감정
+      calm: 20, contemplative: 10, curious: 30, nostalgic: 0, confused: -10, indifferent: 0,
+      // 기존 호환성을 위한 매핑
+      happy: 70, sad: -60, angry: -70, anxious: -65, neutral: 0,
+      excited: 75, peaceful: 20
     };
 
     const weekDays = ['월', '화', '수', '목', '금', '토', '일'];
     const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
-    async function loadStats() {
-      const { data: { user } } = await supabase.auth.getUser();
+    async function loadAIDashboard() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
 
-      const { data, error } = await supabase
-        .from('diaries')
-        .select('emotion, created_at')
-        .eq('user_id', user.id);
+        // 확장된 감정 데이터 조회 (새 컬럼들 포함)
+        const { data, error } = await supabase
+          .from('diaries')
+          .select(`
+            emotion,
+            created_at,
+            mood_score,
+            keywords,
+            ai_insights,
+            emotion_confidence,
+            complexity_score
+          `)
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
 
-      if (error || !data || data.length === 0) {
+        if (error) {
+          console.error('데이터 로드 실패:', error);
+          document.getElementById('no-data').style.display = 'block';
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          document.getElementById('no-data').style.display = 'block';
+          return;
+        }
+
+        // 대시보드 표시
+        document.getElementById('main-dashboard').style.display = 'grid';
+
+        // 감정 통계 계산
+        const emotionStats = calculateEmotionStats(data);
+
+        // AI 인사이트 생성
+        await generateAIInsights(data.slice(0, 10)); // 최근 10개 일기 분석
+
+        // 감정 프로필 표시
+        displayEmotionProfile(emotionStats);
+
+        // 차트 그리기
+        drawAllCharts(data, emotionStats);
+
+      } catch (error) {
+        console.error('AI 대시보드 로드 실패:', error);
         document.getElementById('no-data').style.display = 'block';
-        return;
       }
+    }
 
-      const emotionCounts = { happy: 0, sad: 0, angry: 0, anxious: 0, neutral: 0 };
+    function calculateEmotionStats(data) {
+      const stats = {
+        total: data.length,
+        emotions: {},
+        recentEmotions: [],
+        averageMood: 0,
+        averageConfidence: 0,
+        averageComplexity: 0
+      };
+
+      // 모든 감정 초기화
+      Object.keys(emotionScores).forEach(emotion => {
+        stats.emotions[emotion] = 0;
+      });
+
+      // 통계 계산
+      let totalMood = 0, totalConfidence = 0, totalComplexity = 0;
+      let validMoods = 0, validConfidences = 0, validComplexities = 0;
+
       data.forEach(entry => {
-        if (emotionCounts[entry.emotion] !== undefined) {
-          emotionCounts[entry.emotion]++;
+        // 감정별 카운트
+        if (stats.emotions[entry.emotion] !== undefined) {
+          stats.emotions[entry.emotion]++;
+        }
+
+        // 평균 계산을 위한 합계
+        if (entry.mood_score !== null && entry.mood_score !== undefined) {
+          totalMood += entry.mood_score;
+          validMoods++;
+        }
+
+        if (entry.emotion_confidence !== null && entry.emotion_confidence !== undefined) {
+          totalConfidence += entry.emotion_confidence;
+          validConfidences++;
+        }
+
+        if (entry.complexity_score !== null && entry.complexity_score !== undefined) {
+          totalComplexity += entry.complexity_score;
+          validComplexities++;
+        }
+
+        // 최근 감정 (최근 30일)
+        const entryDate = new Date(entry.created_at);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        if (entryDate >= thirtyDaysAgo) {
+          stats.recentEmotions.push({
+            emotion: entry.emotion,
+            date: entry.created_at,
+            mood_score: entry.mood_score,
+            insights: entry.ai_insights
+          });
         }
       });
 
-      const emotionKeys = Object.keys(emotionCounts);
-      const chartLabels = emotionKeys.map(e => ({
-        happy: '😊 행복',
-        sad: '😢 슬픔',
-        angry: '😠 분노',
-        anxious: '😟 불안',
-        neutral: '😐 보통'
-      }[e]));
+      // 평균 계산
+      stats.averageMood = validMoods > 0 ? totalMood / validMoods : 0;
+      stats.averageConfidence = validConfidences > 0 ? totalConfidence / validConfidences : 0;
+      stats.averageComplexity = validComplexities > 0 ? totalComplexity / validComplexities : 0;
 
-      const chartData = Object.values(emotionCounts);
+      return stats;
+    }
 
-      document.getElementById('emotionChart').style.display = 'block';
-      new Chart(document.getElementById('emotionChart'), {
-        type: 'pie',
+    async function generateAIInsights(recentData) {
+      try {
+        // 로컬 개발 환경 감지
+        const isLocalDev = window.location.hostname === 'localhost' ||
+                          window.location.hostname === '127.0.0.1' ||
+                          window.location.port;
+
+        if (isLocalDev) {
+          // 로컬 개발용 모의 AI 인사이트 생성
+          const mockInsight = generateMockAIInsight(recentData);
+          displayAIInsights(mockInsight);
+          return;
+        }
+
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+
+        if (!token) {
+          displayAIInsights('로그인이 필요합니다.');
+          return;
+        }
+
+        const response = await fetch('/.netlify/functions/emotion-summary', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            emotions: recentData.map(entry => ({
+              emotion: entry.emotion,
+              score: entry.mood_score || 0,
+              date: entry.created_at
+            }))
+          })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          displayAIInsights(result.summary);
+        } else {
+          const fallbackInsight = generateMockAIInsight(recentData);
+          displayAIInsights(`${fallbackInsight} (오프라인 분석)`);
+        }
+      } catch (error) {
+        console.error('AI 인사이트 생성 실패:', error);
+        const fallbackInsight = generateMockAIInsight(recentData);
+        displayAIInsights(`${fallbackInsight} (로컬 분석)`);
+      }
+    }
+
+    // 로컬 개발용 모의 AI 인사이트 생성
+    function generateMockAIInsight(recentData) {
+      if (!recentData || recentData.length === 0) {
+        return '아직 충분한 감정 데이터가 없습니다. 더 많은 일기를 작성해보세요!';
+      }
+
+      // 감정 분포 분석
+      const emotionCounts = {};
+      let totalMood = 0;
+      let validMoods = 0;
+
+      recentData.forEach(entry => {
+        emotionCounts[entry.emotion] = (emotionCounts[entry.emotion] || 0) + 1;
+        if (entry.mood_score !== null && entry.mood_score !== undefined) {
+          totalMood += entry.mood_score;
+          validMoods++;
+        }
+      });
+
+      const avgMood = validMoods > 0 ? totalMood / validMoods : 0;
+      const dominantEmotion = Object.keys(emotionCounts).reduce((a, b) =>
+        emotionCounts[a] > emotionCounts[b] ? a : b
+      );
+
+      // 감정별 설명
+      const emotionDescriptions = {
+        joy: '기쁨이 가득한', contentment: '만족스러운', gratitude: '감사가 넘치는',
+        love: '사랑이 충만한', excitement: '설레는', pride: '자랑스러운',
+        hope: '희망찬', relief: '안도하는', sadness: '슬픔이 있는',
+        grief: '비탄에 빠진', anger: '분노가 있는', frustration: '좌절감이 있는',
+        anxiety: '불안한', fear: '두려움이 있는', guilt: '죄책감이 있는',
+        shame: '수치심을 느끼는', loneliness: '외로운', disappointment: '실망스러운',
+        calm: '평온한', contemplative: '사색적인', curious: '호기심 많은',
+        nostalgic: '그리움이 있는', confused: '혼란스러운', indifferent: '무관심한',
+        happy: '행복한', sad: '슬픈', angry: '화가 난', anxious: '불안한',
+        neutral: '평범한', excited: '신나는', peaceful: '평화로운'
+      };
+
+      let analysis = '';
+
+      // 기분 점수 기반 분석
+      if (avgMood > 30) {
+        analysis = `최근 ${recentData.length}일 동안 전반적으로 긍정적인 시간을 보내고 계시네요! `;
+        analysis += `특히 ${emotionDescriptions[dominantEmotion] || dominantEmotion} 감정이 두드러집니다. `;
+        analysis += '이런 좋은 에너지를 계속 유지하시길 바라요. 😊';
+      } else if (avgMood < -30) {
+        analysis = `최근 ${recentData.length}일 동안 힘든 시간을 보내고 계시는 것 같아요. `;
+        analysis += `${emotionDescriptions[dominantEmotion] || dominantEmotion} 감정이 주를 이루고 있습니다. `;
+        analysis += '충분한 휴식과 자기 돌봄이 필요할 것 같아요. 💙';
+      } else {
+        analysis = `최근 ${recentData.length}일 동안 비교적 균형잡힌 감정 상태를 유지하고 계시네요. `;
+        analysis += `${emotionDescriptions[dominantEmotion] || dominantEmotion} 감정이 가장 많이 나타났습니다. `;
+        analysis += '현재의 안정적인 상태를 잘 유지해보세요. 😌';
+      }
+
+      return analysis;
+    }
+
+    function displayAIInsights(summary) {
+      const container = document.getElementById('ai-insights-container');
+      container.innerHTML = `
+        <div class="ai-insights-header">
+          <h3>🧠 AI 감정 인사이트</h3>
+          <span class="ai-badge">GPT-4o 분석</span>
+        </div>
+        <div class="ai-insights-content">
+          <p>${summary}</p>
+        </div>
+        <div class="ai-insights-actions">
+          <button onclick="aiDashboard.getDetailedAnalysis()" class="btn-ai-detail">
+            📊 상세 분석 보기
+          </button>
+          <button onclick="aiDashboard.getRecommendations()" class="btn-ai-recommend">
+            💡 맞춤 추천 받기
+          </button>
+        </div>
+      `;
+    }
+
+    function displayEmotionProfile(stats) {
+      // 상위 3개 감정 추출
+      const topEmotions = Object.entries(stats.emotions)
+        .filter(([emotion, count]) => count > 0)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 3);
+
+      const container = document.getElementById('emotion-profile-container');
+      container.innerHTML = `
+        <div class="profile-header">
+          <h3>📊 나의 감정 프로필</h3>
+          <div class="total-entries">총 ${stats.total}개 일기</div>
+        </div>
+
+        <div class="top-emotions">
+          <h4>주요 감정 TOP 3</h4>
+          <div class="emotion-badges">
+            ${topEmotions.map(([emotion, count]) => {
+              const percentage = Math.round((count / stats.total) * 100);
+              return `
+                <div class="emotion-badge ${emotion}">
+                  <span class="emotion-icon">${getEmotionIcon(emotion)}</span>
+                  <span class="emotion-name">${getEmotionLabel(emotion)}</span>
+                  <span class="emotion-percentage">${percentage}%</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <div class="profile-stats">
+          <div class="stat-item">
+            <strong>평균 기분 점수:</strong> ${Math.round(stats.averageMood)}
+          </div>
+          <div class="stat-item">
+            <strong>AI 분석 신뢰도:</strong> ${Math.round(stats.averageConfidence * 100)}%
+          </div>
+          <div class="stat-item">
+            <strong>감정 복잡도:</strong> ${Math.round(stats.averageComplexity * 100)}%
+          </div>
+        </div>
+      `;
+    }
+
+    function drawAllCharts(data, stats) {
+      // 감정 분포 파이 차트
+      drawEmotionPieChart(stats);
+
+      // 기분 변화 트렌드 차트
+      drawMoodTrendChart(data);
+
+      // 시간대별 패턴 차트
+      drawHourlyPatternChart(data);
+
+      // 요일별 패턴 차트
+      drawWeeklyPatternChart(data);
+    }
+
+    function drawEmotionPieChart(stats) {
+      const ctx = document.getElementById('emotion-pie-chart');
+      if (!ctx) return;
+
+      const validEmotions = Object.entries(stats.emotions)
+        .filter(([emotion, count]) => count > 0);
+
+      if (validEmotions.length === 0) {
+        ctx.getContext('2d').fillText('데이터가 없습니다', 150, 150);
+        return;
+      }
+
+      new Chart(ctx, {
+        type: 'doughnut',
         data: {
-          labels: chartLabels,
+          labels: validEmotions.map(([emotion]) => getEmotionLabel(emotion)),
           datasets: [{
-            data: chartData,
-            backgroundColor: ['#74c0fc','#ff8787','#ffa94d','#ffd43b','#ced4da'],
-            borderColor: '#fff',
-            borderWidth: 2
+            data: validEmotions.map(([, count]) => count),
+            backgroundColor: validEmotions.map(([emotion]) => getEmotionColor(emotion)),
+            borderWidth: 3,
+            borderColor: '#fff'
           }]
         },
         options: {
           responsive: true,
+          maintainAspectRatio: true,
+          aspectRatio: 1,
           plugins: {
-            legend: { position: 'bottom' },
-            title: { display: true, text: '감정별 비율' }
-          },
-          onClick: (e, elements) => {
-            if (elements.length > 0) {
-              const index = elements[0].index;
-              const emotionKey = emotionKeys[index];
-              window.location.href = `my-diary.html?emotion=${emotionKey}`;
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 15,
+                usePointStyle: true,
+                font: { size: 12 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = Math.round((context.parsed / total) * 100);
+                  return `${context.label}: ${percentage}%`;
+                }
+              }
             }
           }
         }
       });
+    }
 
-      const dateMap = {}, weekMap = {}, hourMap = {};
-      weekDays.forEach(d => weekMap[d] = []);
-      hours.forEach(h => hourMap[h] = []);
+    function drawMoodTrendChart(data) {
+      const ctx = document.getElementById('mood-trend-chart');
+      if (!ctx) return;
 
-      data.forEach(entry => {
-        const date = new Date(entry.created_at);
+      // 최근 30일 데이터 준비
+      const last30Days = [];
+      const today = new Date();
+
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
         const dateStr = date.toISOString().split('T')[0];
-        const weekday = weekDays[date.getDay() === 0 ? 6 : date.getDay() - 1];
-        const hour = `${date.getHours()}:00`;
-        const score = emotionScores[entry.emotion];
 
-        if (score !== undefined) {
-          dateMap[dateStr] = (dateMap[dateStr] || []).concat(score);
-          weekMap[weekday].push(score);
-          hourMap[hour].push(score);
-        }
-      });
+        const dayData = data.filter(entry =>
+          entry.created_at.split('T')[0] === dateStr
+        );
 
-      const sortedDates = Object.keys(dateMap).sort();
-      const dateLabels = [], dateData = [];
-      sortedDates.forEach(date => {
-        const avg = dateMap[date].reduce((a, b) => a + b, 0) / dateMap[date].length;
-        dateLabels.push(date);
-        dateData.push(avg.toFixed(2));
-      });
+        const avgMood = dayData.length > 0
+          ? dayData.reduce((sum, entry) => sum + (entry.mood_score || 0), 0) / dayData.length
+          : null;
 
-      new Chart(document.getElementById('emotionTrendChart'), {
+        last30Days.push({
+          date: date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
+          mood: avgMood
+        });
+      }
+
+      new Chart(ctx, {
         type: 'line',
         data: {
-          labels: dateLabels,
+          labels: last30Days.map(d => d.date),
           datasets: [{
-            label: '날짜별 감정 점수 (2 ~ -2)',
-            data: dateData,
-            borderColor: '#4dabf7',
-            tension: 0.3
+            label: '기분 점수',
+            data: last30Days.map(d => d.mood),
+            borderColor: '#74c0fc',
+            backgroundColor: 'rgba(116, 192, 252, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#74c0fc',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4
           }]
         },
         options: {
           responsive: true,
+          maintainAspectRatio: true,
+          aspectRatio: 2,
           scales: {
-            y: { suggestedMin: -2, suggestedMax: 2 }
+            y: {
+              beginAtZero: true,
+              min: -100,
+              max: 100,
+              grid: { color: 'rgba(0,0,0,0.1)' },
+              ticks: {
+                callback: function(value) {
+                  if (value > 50) return '😊 좋음';
+                  if (value > 0) return '😐 보통';
+                  if (value > -50) return '😔 안 좋음';
+                  return '😢 나쁨';
+                }
+              }
+            },
+            x: { grid: { color: 'rgba(0,0,0,0.1)' } }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const value = context.parsed.y;
+                  if (value === null) return '데이터 없음';
+                  let emoji = '😐';
+                  if (value > 50) emoji = '😊';
+                  else if (value > 0) emoji = '🙂';
+                  else if (value > -50) emoji = '😔';
+                  else emoji = '😢';
+                  return `${emoji} 기분 점수: ${Math.round(value)}`;
+                }
+              }
+            }
           }
         }
       });
+    }
 
-      const weekData = weekDays.map(day => {
-        const scores = weekMap[day];
-        return scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2) : null;
+    function drawHourlyPatternChart(data) {
+      const ctx = document.getElementById('hourly-pattern-chart');
+      if (!ctx) return;
+
+      const hourlyData = Array(24).fill(0).map((_, hour) => {
+        const hourData = data.filter(entry => {
+          const entryHour = new Date(entry.created_at).getHours();
+          return entryHour === hour;
+        });
+
+        return hourData.length > 0
+          ? hourData.reduce((sum, entry) => sum + (entry.mood_score || 0), 0) / hourData.length
+          : 0;
       });
 
-      new Chart(document.getElementById('weeklyEmotionChart'), {
-        type: 'line',
-        data: {
-          labels: weekDays,
-          datasets: [{
-            label: '요일별 감정 점수',
-            data: weekData,
-            borderColor: '#20c997',
-            tension: 0.3
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: { suggestedMin: -2, suggestedMax: 2 }
-          }
-        }
-      });
-
-      const hourData = hours.map(hour => {
-        const scores = hourMap[hour];
-        return scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2) : null;
-      });
-
-      new Chart(document.getElementById('hourlyEmotionChart'), {
+      new Chart(ctx, {
         type: 'bar',
         data: {
           labels: hours,
           datasets: [{
-            label: '시간대별 평균 감정 점수',
-            data: hourData,
-            backgroundColor: '#fab005'
+            label: '시간대별 평균 기분',
+            data: hourlyData,
+            backgroundColor: hours.map((_, i) => {
+              const value = hourlyData[i];
+              if (value > 30) return 'rgba(116, 192, 252, 0.8)';
+              if (value > 0) return 'rgba(116, 192, 252, 0.5)';
+              if (value > -30) return 'rgba(255, 135, 135, 0.5)';
+              return 'rgba(255, 135, 135, 0.8)';
+            }),
+            borderColor: '#74c0fc',
+            borderWidth: 1
           }]
         },
         options: {
           responsive: true,
+          maintainAspectRatio: true,
+          aspectRatio: 2,
           scales: {
-            y: { suggestedMin: -2, suggestedMax: 2 }
-          }
+            y: {
+              min: -100,
+              max: 100,
+              grid: { color: 'rgba(0,0,0,0.1)' }
+            },
+            x: { grid: { color: 'rgba(0,0,0,0.1)' } }
+          },
+          plugins: { legend: { display: false } }
         }
       });
-
-      await requestWeeklySummary(weekDays, weekData);
     }
 
-    async function requestWeeklySummary(labels, data) {
-      const res = await fetch('/.netlify/functions/emotion-summary', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          emotions: labels.map((day, i) => ({ date: day, score: data[i] }))
-        })
+    function drawWeeklyPatternChart(data) {
+      const ctx = document.getElementById('weekly-pattern-chart');
+      if (!ctx) return;
+
+      const weeklyData = weekDays.map(day => {
+        const dayIndex = weekDays.indexOf(day);
+        const dayData = data.filter(entry => {
+          const entryDay = new Date(entry.created_at).getDay();
+          const mappedDay = entryDay === 0 ? 6 : entryDay - 1; // 일요일을 6으로 매핑
+          return mappedDay === dayIndex;
+        });
+
+        return dayData.length > 0
+          ? dayData.reduce((sum, entry) => sum + (entry.mood_score || 0), 0) / dayData.length
+          : 0;
       });
 
-      const result = await res.json();
-      document.getElementById('gpt-summary').innerText = result.summary || 'GPT 분석 실패';
+      new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: weekDays,
+          datasets: [{
+            label: '요일별 평균 기분',
+            data: weeklyData,
+            borderColor: '#51cf66',
+            backgroundColor: 'rgba(81, 207, 102, 0.2)',
+            borderWidth: 3,
+            pointBackgroundColor: '#51cf66',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          aspectRatio: 1,
+          scales: {
+            r: {
+              min: -100,
+              max: 100,
+              grid: { color: 'rgba(0,0,0,0.1)' },
+              pointLabels: { font: { size: 12 } }
+            }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
     }
 
-    loadStats();
+    // 유틸리티 함수들
+    function getEmotionIcon(emotion) {
+      const icons = {
+        joy: '😄', contentment: '😊', gratitude: '🙏', love: '❤️', excitement: '🤩',
+        pride: '😤', hope: '🌟', relief: '😌',
+        sadness: '😢', grief: '😭', anger: '😠', frustration: '😤', anxiety: '😰',
+        fear: '😨', guilt: '😔', shame: '😳', loneliness: '😞', disappointment: '😕',
+        calm: '😌', contemplative: '🤔', curious: '🤨', nostalgic: '😌', confused: '😕', indifferent: '😐',
+        happy: '😊', sad: '😢', angry: '😠', anxious: '😰', neutral: '😐',
+        excited: '🤩', peaceful: '😌'
+      };
+      return icons[emotion] || '😐';
+    }
+
+    function getEmotionLabel(emotion) {
+      const labels = {
+        joy: '기쁨', contentment: '만족', gratitude: '감사', love: '사랑', excitement: '흥분/설렘',
+        pride: '자부심', hope: '희망', relief: '안도',
+        sadness: '슬픔', grief: '비탄', anger: '분노', frustration: '좌절', anxiety: '불안',
+        fear: '두려움', guilt: '죄책감', shame: '수치심', loneliness: '외로움', disappointment: '실망',
+        calm: '평온', contemplative: '사색적', curious: '호기심', nostalgic: '그리움', confused: '혼란', indifferent: '무관심',
+        happy: '행복', sad: '슬픔', angry: '분노', anxious: '불안', neutral: '보통',
+        excited: '신남', peaceful: '평온'
+      };
+      return labels[emotion] || '알 수 없음';
+    }
+
+    function getEmotionColor(emotion) {
+      const colors = {
+        joy: '#74c0fc', contentment: '#69db7c', gratitude: '#ffd43b', love: '#ff6b9d', excitement: '#ff8cc8',
+        pride: '#fd7e14', hope: '#fcc419', relief: '#51cf66',
+        sadness: '#74c0fc', grief: '#495057', anger: '#ff8787', frustration: '#ffa94d', anxiety: '#ffd43b',
+        fear: '#6c757d', guilt: '#9775fa', shame: '#e03131', loneliness: '#868e96', disappointment: '#adb5bd',
+        calm: '#51cf66', contemplative: '#9775fa', curious: '#ff922b', nostalgic: '#da77f2', confused: '#9775fa', indifferent: '#ced4da',
+        happy: '#74c0fc', sad: '#ff8787', angry: '#ff8787', anxious: '#ffd43b', neutral: '#ced4da',
+        excited: '#ff6b9d', peaceful: '#51cf66'
+      };
+      return colors[emotion] || '#ced4da';
+    }
+
+    // 대시보드 로드
+    loadAIDashboard();
   </script>
 
   <script type="module" src="./js/components/nav.js"></script>
