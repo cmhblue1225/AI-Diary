@@ -10,7 +10,7 @@ export const handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Content-Type': 'application/json'
   };
 
@@ -23,8 +23,8 @@ export const handler = async (event, context) => {
     };
   }
 
-  // GET 요청만 허용
-  if (event.httpMethod !== 'GET') {
+  // GET과 POST 요청 허용
+  if (!['GET', 'POST'].includes(event.httpMethod)) {
     return {
       statusCode: 405,
       headers,
@@ -33,7 +33,53 @@ export const handler = async (event, context) => {
   }
 
   try {
-    // JWT 토큰에서 사용자 ID 추출
+    // POST 요청: GPT 기반 감정 주간 분석
+    if (event.httpMethod === 'POST') {
+      const { emotions } = JSON.parse(event.body || '{}');
+
+      if (!emotions || !Array.isArray(emotions)) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: '감정 데이터가 필요합니다.' })
+        };
+      }
+
+      // 간단한 감정 패턴 분석 (OpenAI 없이)
+      const validEmotions = emotions.filter(e => e.score !== null);
+      if (validEmotions.length === 0) {
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            summary: '아직 충분한 감정 데이터가 없습니다. 더 많은 일기를 작성해보세요!'
+          })
+        };
+      }
+
+      const avgScore = validEmotions.reduce((sum, e) => sum + parseFloat(e.score), 0) / validEmotions.length;
+      const trend = avgScore > 0.5 ? '긍정적' : avgScore < -0.5 ? '부정적' : '안정적';
+
+      let summary = `이번 주 감정 패턴은 전반적으로 ${trend}인 경향을 보입니다. `;
+
+      if (avgScore > 0.5) {
+        summary += '행복하고 긍정적인 감정이 많았네요! 이런 좋은 에너지를 계속 유지하시길 바라요. ';
+      } else if (avgScore < -0.5) {
+        summary += '힘든 시간을 보내고 계시는군요. 충분한 휴식과 자기 돌봄이 필요할 것 같아요. ';
+      } else {
+        summary += '비교적 균형잡힌 감정 상태를 유지하고 계시네요. ';
+      }
+
+      summary += `총 ${validEmotions.length}일의 기록을 분석했습니다.`;
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ summary })
+      };
+    }
+
+    // GET 요청: 기존 사용자 감정 통계 로직
     const authHeader = event.headers.authorization || event.headers.Authorization;
     if (!authHeader) {
       return {
