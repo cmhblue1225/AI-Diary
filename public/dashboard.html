@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Emotion Dashboard</title>
+  <title>대시보드 - 한 숨의 위로</title>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -105,8 +105,56 @@
   </style>
 </head>
 <body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="dashboard.html" class="nav-brand">🌙 한 숨의 위로</a>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link active">대시보드</a>
+        </li>
+        <li class="nav-item">
+          <a href="write-diary.html" class="nav-link">일기 작성</a>
+        </li>
+        <li class="nav-item">
+          <a href="my-diary.html" class="nav-link">내 일기</a>
+        </li>
+        <li class="nav-item">
+          <a href="anonymous-community.html" class="nav-link">익명 커뮤니티</a>
+        </li>
+        <li class="nav-item">
+          <a href="stats.html" class="nav-link">통계</a>
+        </li>
+        <li class="nav-item">
+          <a href="my-page.html" class="nav-link">마이페이지</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
   <div class="container">
     <h1>📊 감정 대시보드</h1>
+
+    <!-- Phase 2 기능 소개 섹션 -->
+    <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+      <h2 style="color: white;">🚀 Phase 2 새로운 기능들</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
+        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+          <h3 style="margin: 0 0 10px 0; color: #ffd43b;">🎯 멀티모달 AI</h3>
+          <p style="margin: 0 0 10px 0; font-size: 14px;">텍스트, 이미지, 음성을 통합 분석</p>
+          <a href="write-diary.html" style="color: #ffd43b; text-decoration: underline;">체험하기 →</a>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+          <h3 style="margin: 0 0 10px 0; color: #69db7c;">🔮 감정 예측</h3>
+          <p style="margin: 0 0 10px 0; font-size: 14px;">7일 후 감정 상태 예측</p>
+          <a href="write-diary.html" style="color: #69db7c; text-decoration: underline;">예측받기 →</a>
+        </div>
+        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+          <h3 style="margin: 0 0 10px 0; color: #ff8cc8;">🤝 익명 커뮤니티</h3>
+          <p style="margin: 0 0 10px 0; font-size: 14px;">안전한 감정 공유 공간</p>
+          <a href="anonymous-community.html" style="color: #ff8cc8; text-decoration: underline;">참여하기 →</a>
+        </div>
+      </div>
+    </div>
 
     <div class="section" id="recent-diaries">
       <h2>📝 최근 내 일기</h2>

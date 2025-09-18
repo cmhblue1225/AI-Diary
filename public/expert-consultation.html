@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전문가 상담 - 한 숨의 위로</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .consultation-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .consultation-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .analysis-section {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .needs-analysis {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .expert-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .expert-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .expert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .expert-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .expert-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .expert-details h3 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+
+        .expert-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stars {
+            color: #ffd43b;
+        }
+
+        .match-score {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .specializations {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .specialization-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .expert-bio {
+            margin: 15px 0;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        .booking-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .consultation-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .consultation-type {
+            padding: 6px 12px;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .consultation-type:hover,
+        .consultation-type.selected {
+            background: #51cf66;
+            color: white;
+            border-color: #51cf66;
+        }
+
+        .price-info {
+            text-align: right;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #51cf66;
+        }
+
+        .book-btn {
+            background: #51cf66;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .book-btn:hover {
+            background: #40c057;
+        }
+
+        .my-consultations {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .consultation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .consultation-status {
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-scheduled {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-ongoing {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .consultation-container {
+                padding: 10px;
+            }
+
+            .expert-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .booking-section {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .consultation-options {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="dashboard.html" class="nav-brand">🌙 한 숨의 위로</a>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link">대시보드</a>
+                </li>
+                <li class="nav-item">
+                    <a href="write-diary.html" class="nav-link">일기 작성</a>
+                </li>
+                <li class="nav-item">
+                    <a href="my-diary.html" class="nav-link">내 일기</a>
+                </li>
+                <li class="nav-item">
+                    <a href="anonymous-community.html" class="nav-link">익명 커뮤니티</a>
+                </li>
+                <li class="nav-item">
+                    <a href="expert-consultation.html" class="nav-link active">전문가 상담</a>
+                </li>
+                <li class="nav-item">
+                    <a href="stats.html" class="nav-link">통계</a>
+                </li>
+                <li class="nav-item">
+                    <a href="my-page.html" class="nav-link">마이페이지</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="consultation-container">
+            <div class="consultation-header">
+                <h1>👨‍⚕️ 전문가 심리 상담</h1>
+                <p>AI 분석을 바탕으로 가장 적합한 심리상담사를 매칭해드립니다</p>
+            </div>
+
+            <!-- AI 상담 요구사항 분석 섹션 -->
+            <div class="analysis-section">
+                <h3>🧠 AI 상담 요구사항 분석</h3>
+                <button id="analyze-needs-btn" class="btn btn-primary" style="margin-bottom: 20px;">
+                    📊 내 상담 요구사항 분석하기
+                </button>
+
+                <div id="needs-analysis-result" style="display: none;">
+                    <!-- 분석 결과가 여기에 표시됩니다 -->
+                </div>
+            </div>
+
+            <!-- 내 상담 예약 현황 -->
+            <div class="my-consultations">
+                <h3>📅 내 상담 예약</h3>
+                <div id="my-consultations-list">
+                    <div class="loading">상담 예약을 불러오는 중...</div>
+                </div>
+            </div>
+
+            <!-- 추천 전문가 목록 -->
+            <div class="analysis-section">
+                <h3>👨‍⚕️ 추천 전문가</h3>
+                <div id="experts-list">
+                    <div class="loading">전문가 목록을 불러오는 중...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 예약 모달 -->
+    <div id="booking-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>📅 상담 예약</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="booking-form">
+                    <div style="margin-bottom: 15px;">
+                        <label>상담 유형:</label>
+                        <select id="consultation-type-select" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+                            <option value="text_chat">💬 텍스트 채팅</option>
+                            <option value="voice_call">📞 음성 통화</option>
+                            <option value="video_call">📹 화상 통화</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label>예약 날짜 및 시간:</label>
+                        <input type="datetime-local" id="scheduled-datetime" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <label>상담 시간 (분):</label>
+                        <select id="duration-select" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+                            <option value="30">30분</option>
+                            <option value="50" selected>50분</option>
+                            <option value="80">80분</option>
+                        </select>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <h4>AI 상담 준비 요약</h4>
+                        <div id="ai-preparation-summary">
+                            상담사와 공유할 AI 분석 요약이 여기에 표시됩니다.
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button id="confirm-booking-btn" class="btn btn-primary" style="flex: 1;">예약 확정</button>
+                        <button id="cancel-booking-btn" class="btn btn-secondary" style="flex: 1;">취소</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/supabase.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/expert-consultation.js"></script>
+    <script type="module">
+        import { checkAuth } from './js/auth.js';
+        import { ExpertConsultation } from './js/expert-consultation.js';
+
+        // 인증 확인
+        checkAuth();
+
+        // 전문가 상담 시스템 초기화
+        window.expertConsultation = new ExpertConsultation();
+    </script>
+</body>
+</html>
