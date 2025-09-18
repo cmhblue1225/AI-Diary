@@ -84,8 +84,8 @@ self.addEventListener('fetch', event => {
 
         return fetch(request)
           .then(response => {
-            // 성공적인 응답만 캐시
-            if (response.status === 200) {
+            // GET 요청이고 성공적인 응답만 캐시 (POST, PUT, DELETE 등은 캐시하지 않음)
+            if (request.method === 'GET' && response.status === 200) {
               const responseClone = response.clone();
               caches.open(CACHE_NAME)
                 .then(cache => {
