@@ -1,7 +1,8 @@
 // Phase 2: 멀티모달 일기 작성 및 AI 분석 기능
 
 export class MultimodalDiary {
-  constructor() {
+  constructor(supabase) {
+    this.supabase = supabase;
     this.attachments = [];
     this.analysis = null;
     this.isRecording = false;
@@ -361,6 +362,13 @@ export class MultimodalDiary {
         return;
       }
 
+      // Supabase 세션에서 토큰 가져오기
+      const { data: { session } } = await this.supabase.auth.getSession();
+      if (!session) {
+        throw new Error('로그인이 필요합니다.');
+      }
+      const token = session.access_token;
+
       // 먼저 텍스트 감정 분석 수행
       let textAnalysis = null;
       if (content) {
@@ -368,7 +376,7 @@ export class MultimodalDiary {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('supabase.auth.token')}`
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
             content: content,
@@ -401,7 +409,7 @@ export class MultimodalDiary {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('supabase.auth.token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(analysisData)
       });

@@ -366,7 +366,7 @@
 
         // 탭별 초기화
         if (targetTab === 'multimodal' && !window.multimodalDiary) {
-          window.multimodalDiary = new MultimodalDiary();
+          window.multimodalDiary = new MultimodalDiary(supabase);
         } else if (targetTab === 'prediction' && !window.emotionPrediction) {
           window.emotionPrediction = new EmotionPrediction();
         }
