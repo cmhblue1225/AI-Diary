@@ -225,7 +225,7 @@ async function validatePredictionAccuracy(userId) {
   }
 }
 
-export const handler = async (event, context) => {
+exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',

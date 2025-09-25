@@ -5,7 +5,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY // 서비스 키 필요 (사용자 삭제용)
 );
 
-export const handler = async (event, context) => {
+exports.handler = async (event, context) => {
   // CORS 헤더 설정
   const headers = {
     'Access-Control-Allow-Origin': '*',

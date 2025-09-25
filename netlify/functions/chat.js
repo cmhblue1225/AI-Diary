@@ -1,10 +1,10 @@
-import OpenAI from 'openai';
+const { OpenAI } = require('openai');
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-export const handler = async (event, context) => {
+exports.handler = async (event, context) => {
   // CORS 헤더 설정
   const headers = {
     'Access-Control-Allow-Origin': '*',

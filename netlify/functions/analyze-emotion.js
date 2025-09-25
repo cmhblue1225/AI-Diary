@@ -1,10 +1,10 @@
-import OpenAI from 'openai';
+const { OpenAI } = require('openai');
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-export const handler = async (event, context) => {
+exports.handler = async (event, context) => {
   // CORS 헤더 설정
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -51,7 +51,7 @@ export const handler = async (event, context) => {
 `;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: '감정 분석기입니다. 감정만 정확하게 JSON으로 응답하세요.' },
         { role: 'user', content: `${prompt}\n\n${content}` }
