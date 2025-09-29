@@ -78,6 +78,75 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
+    /* 대시보드 그리드 레이아웃 */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    /* 대시보드 카드 스타일 */
+    .dashboard-card {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* 카드 헤더 */
+    .card-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f1f3f5;
+    }
+
+    .card-header h3 {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #495057;
+      margin: 0;
+    }
+
+    /* AI 인사이트 카드 */
+    .ai-insights-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      grid-column: 1 / -1;
+    }
+
+    .ai-insights-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .ai-insights-header h3 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0;
+      color: white;
+    }
+
+    .ai-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      backdrop-filter: blur(10px);
+    }
+
+    .ai-insights-content {
       font-size: 1.1rem;
       line-height: 1.6;
       margin-bottom: 1.5rem;
@@ -118,11 +187,41 @@
       margin-bottom: 1.5rem;
     }
 
+    .profile-header h3 {
+      color: white !important;
+      margin: 0;
+    }
+
     .total-entries {
       background: rgba(255,255,255,0.2);
       padding: 0.5rem 1rem;
       border-radius: 20px;
       font-weight: bold;
+    }
+
+    .top-emotions h4 {
+      color: white;
+      margin: 0 0 1rem 0;
+      font-size: 1.1rem;
+    }
+
+    .profile-stats {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .stat-item {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 1rem;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-item strong {
+      color: rgba(255, 255, 255, 0.9);
+      margin-right: 0.5rem;
     }
 
     .emotion-badges {
@@ -371,6 +470,11 @@
     @media (max-width: 768px) {
       .dashboard-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .dashboard-card {
+        padding: 1.5rem;
       }
 
       .ai-insights-actions {
@@ -381,8 +485,43 @@
         flex-direction: column;
       }
 
-      .dashboard-header h1 {
+      .profile-stats {
+        gap: 0.5rem;
+      }
+
+      .stat-item {
+        padding: 0.8rem;
+      }
+
+      h1 {
+        font-size: 2rem !important;
+      }
+
+      .ai-insights-header h3 {
+        font-size: 1.25rem;
+      }
+
+      .metric-number {
         font-size: 2rem;
+      }
+
+      canvas {
+        padding: 0.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dashboard-card {
+        padding: 1rem;
+      }
+
+      .card-header {
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+      }
+
+      .emotion-badge {
+        padding: 0.6rem 1rem;
       }
     }
   </style>
@@ -426,15 +565,16 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <div id="no-data" style="display: none;">
-    <h2>📝 아직 일기가 없습니다</h2>
-    <p>첫 번째 일기를 작성하여 AI 분석을 시작해보세요!</p>
-    <a href="write-diary.html" style="color: white; text-decoration: underline;">일기 쓰러 가기 →</a>
-  </div>
+    <!-- No Data Message -->
+    <div id="no-data" style="display: none;">
+      <h2>📝 아직 일기가 없습니다</h2>
+      <p>첫 번째 일기를 작성하여 AI 분석을 시작해보세요!</p>
+      <a href="write-diary.html" style="color: white; text-decoration: underline;">일기 쓰러 가기 →</a>
+    </div>
 
-  <div class="dashboard-grid" id="main-dashboard" style="display: none;">
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid" id="main-dashboard" style="display: none;">
     <!-- AI 인사이트 카드 -->
     <div class="dashboard-card ai-insights-card">
       <div id="ai-insights-container">
@@ -490,7 +630,10 @@
       </div>
       <canvas id="weekly-pattern-chart"></canvas>
     </div>
+    </div>
+    <!-- End of Dashboard Grid -->
   </div>
+  <!-- End of Main Container -->
 
   <script type="module">
     import { supabase } from './js/supabase.js';

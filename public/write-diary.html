@@ -61,11 +61,6 @@
       border: 1px solid rgba(255, 255, 255, 0.18);
     }
 
-    .tab-btn.active {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      transform: scale(1.05);
-    }
 
     .emotion-btn {
       transition: all 0.3s ease;
@@ -125,29 +120,14 @@
         <h1 class="text-4xl font-bold mb-3">📝 오늘의 감정 일기</h1>
         <p class="text-lg opacity-90">당신의 마음을 자유롭게 표현해보세요</p>
         <div class="mt-4 text-sm opacity-80">
-          🎯 멀티모달 AI 분석 · 🔮 감정 예측 · 🎵 맞춤 음악 추천
+          ✍️ 감정 분석 · 💬 AI 피드백 · 🎵 맞춤 음악 추천
         </div>
       </div>
     </div>
 
-    <!-- Tab Navigation -->
-    <div class="flex justify-center mb-8">
-      <div class="bg-white rounded-full p-1 shadow-lg">
-        <button class="tab-btn active px-6 py-3 rounded-full text-sm font-medium transition-all duration-300" data-tab="basic">
-          📝 기본 작성
-        </button>
-        <button class="tab-btn px-6 py-3 rounded-full text-sm font-medium transition-all duration-300" data-tab="multimodal">
-          🎯 멀티모달 AI
-        </button>
-        <button class="tab-btn px-6 py-3 rounded-full text-sm font-medium transition-all duration-300" data-tab="prediction">
-          🔮 감정 예측
-        </button>
-      </div>
-    </div>
 
-    <!-- Basic Writing Tab -->
-    <div id="basic-tab" class="tab-content active">
-      <div class="bg-white rounded-2xl p-8 shadow-lg animate-bounce-in">
+    <!-- 일기 작성 -->
+    <div class="bg-white rounded-2xl p-8 shadow-lg animate-bounce-in">
         <form id="diary-form" class="space-y-6">
           <!-- Content Input -->
           <div>
@@ -231,179 +211,22 @@
         <div id="music-recommendation" class="mt-8" style="display: none;">
           <!-- Music recommendation will be displayed here -->
         </div>
-      </div>
+      </form>
     </div>
 
-    <!-- 멀티모달 AI 탭 -->
-    <div id="multimodal-tab" class="tab-content" style="display: none;">
-      <div style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <h3>🎯 멀티모달 AI 분석</h3>
-        <p style="color: #6c757d; margin-bottom: 20px;">텍스트, 이미지, 음성을 함께 분석하여 더 정확한 감정 분석을 받아보세요.</p>
 
-        <label for="diary-content">일기 내용</label>
-        <textarea id="diary-content" rows="6" placeholder="오늘의 감정을 자유롭게 적어보세요..."></textarea>
-
-        <!-- 첨부 파일 섹션 -->
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
-          <h4>📎 미디어 첨부</h4>
-
-          <!-- 이미지 업로드 -->
-          <div style="margin-bottom: 15px;">
-            <label>📷 이미지 첨부</label>
-            <div style="display: flex; gap: 10px; margin-top: 5px;">
-              <input type="file" id="image-upload" accept="image/*" style="display: none;">
-              <button type="button" onclick="document.getElementById('image-upload').click()" class="btn btn-outline">
-                🖼️ 이미지 선택
-              </button>
-              <button type="button" id="camera-btn" class="btn btn-outline">
-                📸 사진 촬영
-              </button>
-            </div>
-            <div id="camera-status" style="font-size: 12px; color: #6c757d; margin-top: 5px;">
-              카메라: <span class="permission-status">확인 중...</span>
-            </div>
-          </div>
-
-          <!-- 음성 녹음 -->
-          <div style="margin-bottom: 15px;">
-            <label>🎤 음성 녹음</label>
-            <div style="display: flex; gap: 10px; margin-top: 5px;">
-              <button type="button" id="record-btn" class="btn btn-outline">
-                🎤 음성 녹음
-              </button>
-            </div>
-            <div id="microphone-status" style="font-size: 12px; color: #6c757d; margin-top: 5px;">
-              마이크: <span class="permission-status">확인 중...</span>
-            </div>
-            <div id="recording-status" style="display: none; color: #ff6b6b; font-size: 12px; margin-top: 5px;">
-              🔴 녹음 중... (최대 2분)
-            </div>
-          </div>
-
-          <!-- 첨부 파일 목록 -->
-          <div id="attachments-container" style="margin-top: 15px;">
-            <!-- 첨부 파일들이 여기에 표시됩니다 -->
-          </div>
-        </div>
-
-        <!-- 분석 버튼 -->
-        <button type="button" id="multimodal-analyze-btn" class="btn btn-primary" style="width: 100%; margin-bottom: 15px;">
-          🧠 멀티모달 AI 분석
-        </button>
-
-        <!-- 분석 결과 -->
-        <div id="multimodal-results" style="display: none;">
-          <!-- 분석 결과가 여기에 표시됩니다 -->
-        </div>
-      </div>
-    </div>
-
-    <!-- 감정 예측 탭 -->
-    <div id="prediction-tab" class="tab-content" style="display: none;">
-      <div style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <h3>🔮 7일 감정 예측</h3>
-        <p style="color: #6c757d; margin-bottom: 20px;">AI가 당신의 감정 패턴을 분석하여 향후 7일간의 감정 상태를 예측합니다.</p>
-
-        <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-          <button type="button" id="generate-predictions-btn" class="btn btn-primary">
-            🔮 7일 감정 예측 생성
-          </button>
-          <button type="button" id="validate-accuracy-btn" class="btn btn-outline">
-            🎯 예측 정확도 검증
-          </button>
-          <button type="button" id="refresh-predictions-btn" class="btn btn-outline">
-            🔄 새로고침
-          </button>
-        </div>
-
-        <!-- 예측 차트 -->
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-          <canvas id="prediction-chart" style="max-height: 200px;"></canvas>
-        </div>
-
-        <!-- 예측 결과 -->
-        <div id="predictions-container">
-          <!-- 예측 결과가 여기에 표시됩니다 -->
-        </div>
-
-        <!-- 정확도 검증 결과 -->
-        <div id="accuracy-results" style="display: none;">
-          <!-- 정확도 결과가 여기에 표시됩니다 -->
-        </div>
-
-        <!-- 패턴 분석 -->
-        <div id="pattern-analysis" style="display: none;">
-          <!-- 패턴 분석이 여기에 표시됩니다 -->
-        </div>
-
-        <!-- 추천사항 -->
-        <div id="prediction-recommendations" style="display: none;">
-          <!-- 추천사항이 여기에 표시됩니다 -->
-        </div>
-      </div>
-    </div>
 
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module">
     import { supabase } from './js/supabase.js';
     import { checkAuth } from './js/auth.js';
-    import { MultimodalDiary } from './js/multimodal-diary.js';
-    import { EmotionPrediction } from './js/emotion-prediction.js';
 
     // DOM 상태 확인 후 초기화
     function initializePage() {
       console.log('페이지 초기화 시작');
       checkAuth();
 
-    // 탭 네비게이션 설정
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    // 탭 활성화 스타일
-    const setActiveTab = (activeBtn) => {
-      tabBtns.forEach(btn => {
-        btn.classList.remove('active');
-        btn.style.color = '#6c757d';
-        btn.style.borderBottomColor = 'transparent';
-      });
-
-      activeBtn.classList.add('active');
-      activeBtn.style.color = '#667eea';
-      activeBtn.style.borderBottomColor = '#667eea';
-    };
-
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const targetTab = btn.dataset.tab;
-
-        // 모든 탭 숨기기
-        tabContents.forEach(content => {
-          content.style.display = 'none';
-          content.classList.remove('active');
-        });
-
-        // 선택된 탭 표시
-        const targetContent = document.getElementById(`${targetTab}-tab`);
-        if (targetContent) {
-          targetContent.style.display = 'block';
-          targetContent.classList.add('active');
-        }
-
-        setActiveTab(btn);
-
-        // 탭별 초기화
-        if (targetTab === 'multimodal' && !window.multimodalDiary) {
-          window.multimodalDiary = new MultimodalDiary(supabase);
-        } else if (targetTab === 'prediction' && !window.emotionPrediction) {
-          window.emotionPrediction = new EmotionPrediction();
-        }
-      });
-    });
-
-    // 초기 탭 설정
-    setActiveTab(document.querySelector('.tab-btn.active'));
 
     // 감정 선택 버튼 이벤트 핸들러
     const emotionBtns = document.querySelectorAll('.emotion-btn');
