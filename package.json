@@ -2,7 +2,6 @@
   "name": "ai-emotion-diary",
   "version": "1.0.0",
   "description": "AI 기반 감정 분석 일기 서비스",
-  "type": "module",
   "main": "index.js",
   "scripts": {
     "dev": "netlify dev",

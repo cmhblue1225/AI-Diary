@@ -402,6 +402,22 @@
     // 초기 탭 설정
     setActiveTab(document.querySelector('.tab-btn.active'));
 
+    // 감정 선택 버튼 이벤트 핸들러
+    const emotionBtns = document.querySelectorAll('.emotion-btn');
+    emotionBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // 모든 감정 버튼에서 selected 클래스 제거
+        emotionBtns.forEach(b => b.classList.remove('selected'));
+
+        // 클릭된 버튼에 selected 클래스 추가
+        btn.classList.add('selected');
+
+        // hidden input에 감정 값 설정
+        const emotion = btn.dataset.emotion;
+        document.getElementById('emotion').value = emotion;
+      });
+    });
+
     const form = document.getElementById('diary-form');
     const emotionSelect = document.getElementById('emotion');
     const contentInput = document.getElementById('content');

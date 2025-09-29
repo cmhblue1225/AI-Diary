@@ -42,6 +42,29 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // 테스트용: OpenAI API 키가 없을 때 간단한 키워드 기반 분석
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
+      // 간단한 키워드 기반 감정 분석
+      const contentLower = content.toLowerCase();
+      let emotion = 'neutral';
+
+      if (contentLower.includes('행복') || contentLower.includes('기쁘') || contentLower.includes('좋') || contentLower.includes('신나') || contentLower.includes('즐거')) {
+        emotion = 'happy';
+      } else if (contentLower.includes('슬프') || contentLower.includes('우울') || contentLower.includes('힘들') || contentLower.includes('아프') || contentLower.includes('눈물')) {
+        emotion = 'sad';
+      } else if (contentLower.includes('화나') || contentLower.includes('짜증') || contentLower.includes('분노') || contentLower.includes('열받')) {
+        emotion = 'angry';
+      } else if (contentLower.includes('불안') || contentLower.includes('걱정') || contentLower.includes('무서') || contentLower.includes('긴장')) {
+        emotion = 'anxious';
+      }
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ emotion })
+      };
+    }
+
     const prompt = `
 사용자의 일기 내용을 분석하여 감정을 분류하세요.
 감정은 반드시 다음 중 하나입니다: "happy", "sad", "angry", "anxious", "neutral".
