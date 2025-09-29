@@ -180,6 +180,7 @@
   <script type="module">
     import { supabase } from './js/supabase.js';
     import { checkAuth } from './js/auth.js';
+    import { SafetyFilter, renderSafetyResponse } from './js/safety-filter.js';
 
     checkAuth();
 
@@ -276,6 +277,21 @@
 
       if (error || !data) return alert("일기를 불러올 수 없습니다.");
 
+      // 🚨 일기 내용 안전 필터 체크
+      const safetyCheck = SafetyFilter.preCheckMessage(data.content);
+      if (safetyCheck) {
+        console.warn('⚠️ 일기 내용에서 위험 메시지 감지:', data.content);
+
+        // 안전 응답을 즉시 표시
+        renderSafetyResponse(safetyCheck, chatBox);
+
+        // 일기 내용을 위험 메시지로 분류하여 DB에 저장
+        await addMessageToDB("user", `일기 내용: ${data.content}`);
+        await addMessageToDB("assistant", safetyCheck.message);
+
+        return; // 일반 상담 시작 중단
+      }
+
       const prompt = `사용자의 일기 내용은 다음과 같습니다:\n\n"${data.content}"\n\n이 내용을 바탕으로 부드럽게 상담을 시작해주세요.`;
 
       showTyping();
@@ -302,6 +318,15 @@
       e.preventDefault();
       const message = input.value.trim();
       if (!message) return;
+
+      // 🚨 1단계: 클라이언트 측 안전 필터 체크
+      const safetyCheck = SafetyFilter.preCheckMessage(message);
+      if (safetyCheck) {
+        console.warn('⚠️ 위험 메시지 감지, 안전 응답 표시');
+        input.value = ""; // 입력창 즉시 초기화
+        renderSafetyResponse(safetyCheck, chatBox);
+        return; // 일반 채팅 처리 중단
+      }
 
       addMessage("user", message);
       await addMessageToDB("user", message);

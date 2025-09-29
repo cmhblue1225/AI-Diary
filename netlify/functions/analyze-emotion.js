@@ -44,17 +44,20 @@ exports.handler = async (event, context) => {
 
     // 테스트용: OpenAI API 키가 없을 때 간단한 키워드 기반 분석
     if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
+      // 실제 AI 처리 시간을 시뮬레이션
+      await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 600));
+
       // 간단한 키워드 기반 감정 분석
       const contentLower = content.toLowerCase();
       let emotion = 'neutral';
 
-      if (contentLower.includes('행복') || contentLower.includes('기쁘') || contentLower.includes('좋') || contentLower.includes('신나') || contentLower.includes('즐거')) {
+      if (contentLower.includes('행복') || contentLower.includes('기쁘') || contentLower.includes('좋') || contentLower.includes('신나') || contentLower.includes('즐거') || contentLower.includes('쌔행') || contentLower.includes('기분좋') || contentLower.includes('만족')) {
         emotion = 'happy';
-      } else if (contentLower.includes('슬프') || contentLower.includes('우울') || contentLower.includes('힘들') || contentLower.includes('아프') || contentLower.includes('눈물')) {
+      } else if (contentLower.includes('슬프') || contentLower.includes('우울') || contentLower.includes('힘들') || contentLower.includes('아프') || contentLower.includes('눈물') || contentLower.includes('상처') || contentLower.includes('괴로') || contentLower.includes('고통') || contentLower.includes('쓸쓸') || contentLower.includes('외로') || contentLower.includes('절망') || contentLower.includes('힘든 일') || contentLower.includes('너무 힘')) {
         emotion = 'sad';
-      } else if (contentLower.includes('화나') || contentLower.includes('짜증') || contentLower.includes('분노') || contentLower.includes('열받')) {
+      } else if (contentLower.includes('화나') || contentLower.includes('짜증') || contentLower.includes('분노') || contentLower.includes('열받') || contentLower.includes('빡쳐') || contentLower.includes('싫어') || contentLower.includes('꼴보기 싫')) {
         emotion = 'angry';
-      } else if (contentLower.includes('불안') || contentLower.includes('걱정') || contentLower.includes('무서') || contentLower.includes('긴장')) {
+      } else if (contentLower.includes('불안') || contentLower.includes('걱정') || contentLower.includes('무서') || contentLower.includes('긴장') || contentLower.includes('조마조마') || contentLower.includes('떨려') || contentLower.includes('초조')) {
         emotion = 'anxious';
       }
 

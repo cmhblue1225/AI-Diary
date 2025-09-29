@@ -352,7 +352,10 @@
     import { MultimodalDiary } from './js/multimodal-diary.js';
     import { EmotionPrediction } from './js/emotion-prediction.js';
 
-    checkAuth();
+    // DOM 상태 확인 후 초기화
+    function initializePage() {
+      console.log('페이지 초기화 시작');
+      checkAuth();
 
     // 탭 네비게이션 설정
     const tabBtns = document.querySelectorAll('.tab-btn');
@@ -423,55 +426,131 @@
     const contentInput = document.getElementById('content');
     const feedbackBox = document.getElementById('gpt-feedback');
     document.getElementById('analyze-btn').addEventListener('click', async () => {
+      console.log('감정 분석 버튼 클릭됨');
       const content = contentInput.value.trim();
+      console.log('입력된 내용:', content);
+
       if (!content) return alert('일기를 먼저 입력해주세요.');
 
-      const res = await fetch('/.netlify/functions/analyze-emotion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content })
-      });
+      // 로딩 상태 시작
+      const analyzeBtn = document.getElementById('analyze-btn');
+      const originalText = analyzeBtn.innerHTML;
+      analyzeBtn.innerHTML = '🔄 분석 중...';
+      analyzeBtn.disabled = true;
 
-      const data = await res.json();
-      if (data.emotion) {
-        emotionSelect.value = data.emotion;
-        feedbackBox.innerHTML = `<strong>GPT 감정 분석:</strong> ${data.emotion}`;
-      } else {
-        feedbackBox.innerHTML = '<p>감정 분석 실패</p>';
+      try {
+        console.log('API 요청 시작...');
+        const res = await fetch('/.netlify/functions/analyze-emotion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content })
+        });
+
+        console.log('응답 상태:', res.status);
+        const data = await res.json();
+        console.log('응답 데이터:', data);
+
+        if (data.emotion) {
+          emotionSelect.value = data.emotion;
+          feedbackBox.innerHTML = `<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded"><strong>GPT 감정 분석:</strong> ${data.emotion}</div>`;
+          feedbackBox.style.display = 'block';
+
+          // 해당 감정 버튼도 선택 상태로 만들기
+          const emotionBtns = document.querySelectorAll('.emotion-btn');
+          emotionBtns.forEach(btn => btn.classList.remove('selected'));
+          const selectedBtn = document.querySelector(`[data-emotion="${data.emotion}"]`);
+          if (selectedBtn) selectedBtn.classList.add('selected');
+        } else {
+          feedbackBox.innerHTML = '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">감정 분석 실패</div>';
+          feedbackBox.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('감정 분석 오류:', error);
+        feedbackBox.innerHTML = '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">감정 분석 중 오류가 발생했습니다.</div>';
+        feedbackBox.style.display = 'block';
+      } finally {
+        // 로딩 상태 복원
+        analyzeBtn.innerHTML = originalText;
+        analyzeBtn.disabled = false;
       }
     });
 
     document.getElementById('feedback-btn').addEventListener('click', async () => {
+      console.log('GPT 피드백 버튼 클릭됨');
       const diaryContent = contentInput.value.trim();
       const selectedEmotion = emotionSelect.value;
+      console.log('일기 내용:', diaryContent);
+      console.log('선택된 감정:', selectedEmotion);
 
       if (!diaryContent || !selectedEmotion) {
         alert('내용과 감정을 모두 입력해주세요.');
         return;
       }
 
-      const res = await fetch('/.netlify/functions/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ diaryContent, selectedEmotion })
-      });
+      // 로딩 상태 시작
+      const feedbackBtn = document.getElementById('feedback-btn');
+      const originalFeedbackText = feedbackBtn.innerHTML;
+      feedbackBtn.innerHTML = '🤖 AI 분석 중...';
+      feedbackBtn.disabled = true;
 
-      const data = await res.json();
+      try {
+        console.log('피드백 API 요청 시작...');
+        const res = await fetch('/.netlify/functions/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ diaryContent, selectedEmotion })
+        });
 
-      if (data.feedback) {
-        const parsed = parseFeedback(data.feedback);
+        console.log('피드백 응답 상태:', res.status);
+        const data = await res.json();
+        console.log('피드백 응답 데이터:', data);
 
-        feedbackBox.innerHTML = `
-          <div class="music-recommendation-card">
-            <p><strong>✨ 감성 피드백:</strong> ${parsed.feedback}</p>
-            <h3>🎵 추천곡: ${parsed.song}</h3>
-            <p>🎤 가수: ${parsed.artist}</p>
-            <p>📝 추천 이유: ${parsed.reason}</p>
-            <a href="${parsed.youtube}" target="_blank" class="listen-button">▶️ 유튜브에서 듣기</a>
-          </div>
-        `;
-      } else {
-        feedbackBox.innerHTML = '<p>GPT 피드백을 가져오지 못했습니다.</p>';
+        if (data.feedback) {
+          const parsed = parseFeedback(data.feedback);
+          console.log('파싱된 피드백:', parsed);
+
+          feedbackBox.innerHTML = `
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 shadow-lg">
+              <div class="space-y-4">
+                <div>
+                  <h4 class="font-semibold text-gray-800 mb-2 flex items-center space-x-2">
+                    <span>✨</span>
+                    <span>감성 피드백</span>
+                  </h4>
+                  <p class="text-gray-700 leading-relaxed">${parsed.feedback}</p>
+                </div>
+                <div class="pt-4 border-t border-blue-200">
+                  <h4 class="font-semibold text-gray-800 mb-3 flex items-center space-x-2">
+                    <span>🎵</span>
+                    <span>추천 음악</span>
+                  </h4>
+                  <div class="bg-white rounded-lg p-4 border border-blue-100">
+                    <h3 class="font-bold text-lg text-gray-800 mb-1">${parsed.song}</h3>
+                    <p class="text-gray-600 mb-2">🎤 ${parsed.artist}</p>
+                    <p class="text-sm text-gray-500 mb-3">📝 ${parsed.reason}</p>
+                    <a href="${parsed.youtube}" target="_blank"
+                       class="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                      <span>▶️</span>
+                      <span>유튜브에서 듣기</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          feedbackBox.style.display = 'block';
+        } else {
+          feedbackBox.innerHTML = '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">GPT 피드백을 가져오지 못했습니다.</div>';
+          feedbackBox.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('피드백 오류:', error);
+        feedbackBox.innerHTML = '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">피드백 처리 중 오류가 발생했습니다.</div>';
+        feedbackBox.style.display = 'block';
+      } finally {
+        // 로딩 상태 복원
+        feedbackBtn.innerHTML = originalFeedbackText;
+        feedbackBtn.disabled = false;
       }
     });
 
@@ -545,6 +624,15 @@
       alert('일기가 저장되었습니다!');
       location.href = 'my-diary.html';
     });
+
+    } // initializePage() 함수 종료
+
+    // DOM이 준비되면 즉시 초기화 실행
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializePage);
+    } else {
+      initializePage();
+    }
   </script>
 
   <script type="module" src="./js/components/nav.js"></script>

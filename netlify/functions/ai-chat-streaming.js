@@ -190,6 +190,56 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // 🚨 서버 측 안전 필터 체크 (ai-chat-streaming.js)
+    const safetyKeywords = [
+      '죽고 싶어', '죽고싶어', '죽고시펑', '죽고시퍼', '자살', '자해', '목숨', '죽을래', '죽을거야',
+      '자살할래', '자살하고싶어', '죽음', '죽자', '살기 싫어', '살기싫어', '죽어버리고',
+      '죽을정도로', '죽을만큼', '더 이상 못 살겠어', '더이상 못살겠어',
+      '세상이 무너져', '모든 걸 포기', '희망이 없어', '견딜 수 없어',
+      '너무 힘들어서 죽', '고통스러워서 죽', '괴로워서 죽',
+      '뛰어내리', '목을 매', '칼로', '약을 많이', '가스', '독',
+      '살 이유가 없어', '존재 이유', '의미가 없어', '모든 게 끝', '끝내버릴게',
+      '죽고십어', '죽고싶다', '죽어버려', '죽었으면', '사라지고싶어',
+      '그냥 죽', '진짜 죽', '정말 죽', '죽는게 나아', '죽는게 낫겠'
+    ];
+
+    const messageText = message.toLowerCase().replace(/\s/g, '');
+    let isDangerous = false;
+
+    for (const keyword of safetyKeywords) {
+      if (messageText.includes(keyword.toLowerCase().replace(/\s/g, ''))) {
+        isDangerous = true;
+        break;
+      }
+    }
+
+    if (isDangerous) {
+      console.warn('⚠️ ai-chat-streaming에서 위험 메시지 감지:', message);
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          response: `🆘 **도움을 받으세요**
+
+소중한 당신의 마음이 많이 힘드시군요. 혼자 견디지 마시고 전문가의 도움을 받아보세요.
+
+📞 **자살예방상담전화**
+• **전화번호**: 109 (24시간 무료 상담)
+• **언어**: 한국어, 영어
+• **운영 시간**: 24시간 연중무휴
+
+🌐 **온라인 상담**
+• 생명의전화: https://www.lifeline.or.kr
+• 청소년 전화: 1388
+
+💙 **당신은 혼자가 아닙니다**
+지금 이 순간이 힘들더라도, 반드시 좋아질 날이 올 것입니다. 전문 상담사와 이야기해보세요.`,
+          isSafetyResponse: true,
+          processingTime: Date.now() - startTime
+        })
+      };
+    }
+
     // 인증 확인
     const authHeader = event.headers.authorization || event.headers.Authorization;
     if (!authHeader) {
