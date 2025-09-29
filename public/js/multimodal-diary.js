@@ -438,14 +438,14 @@ export class MultimodalDiary {
       success: true,
       individual_analyses: {
         text: {
-          emotions: [{ type: 'contentment', intensity: 75, confidence: 0.9 }],
+          emotions: [{ type: 'happy', intensity: 75, confidence: 0.9 }],
           overall_mood_score: 35,
           keywords: ['평온', '만족', '일상'],
           ai_insights: '전반적으로 안정적인 감정 상태를 보입니다.',
           personalized_advice: '현재의 평온함을 유지하며 자신만의 시간을 즐겨보세요.'
         },
         image: this.attachments.find(a => a.type === 'image') ? {
-          visual_emotions: [{ type: 'calm', intensity: 70, confidence: 0.85 }],
+          visual_emotions: [{ type: 'neutral', intensity: 70, confidence: 0.85 }],
           visual_elements: {
             dominant_colors: ['파란색', '흰색'],
             composition: '안정적인 구도',
@@ -455,7 +455,7 @@ export class MultimodalDiary {
           ai_insights: '평온하고 차분한 시각적 요소들이 감지됩니다.'
         } : null,
         voice: this.attachments.find(a => a.type === 'voice') ? {
-          voice_emotions: [{ type: 'calm', intensity: 65, confidence: 0.8 }],
+          voice_emotions: [{ type: 'neutral', intensity: 65, confidence: 0.8 }],
           speech_characteristics: {
             estimated_tone: '차분함',
             speech_pace: '보통',
@@ -465,7 +465,7 @@ export class MultimodalDiary {
         } : null
       },
       final_analysis: {
-        final_emotions: [{ type: 'contentment', intensity: 72, confidence: 0.88, sources: ['text', 'image', 'voice'] }],
+        final_emotions: [{ type: 'happy', intensity: 72, confidence: 0.88, sources: ['text', 'image', 'voice'] }],
         consistency_analysis: {
           overall_consistency: 0.85,
           conflicting_signals: [],

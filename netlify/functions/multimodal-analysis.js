@@ -22,7 +22,7 @@ async function analyzeImageWithGPT4Vision(imageBase64, textContext = '') {
             content: `당신은 이미지를 통해 감정을 분석하는 전문가입니다. 다음을 분석해주세요:
 
 1. 주요 감정 요소 (색상, 구도, 객체 등)
-2. 추정되는 감정 상태 (24가지 감정 중: joy, contentment, gratitude, love, excitement, pride, hope, relief, sadness, grief, anger, frustration, anxiety, fear, guilt, shame, loneliness, disappointment, calm, contemplative, curious, nostalgic, confused, indifferent)
+2. 추정되는 감정 상태 (5가지 표준 감정 중: happy, sad, angry, anxious, neutral)
 3. 감정 강도 (0-100)
 4. 이미지-텍스트 일치도 분석
 5. 시각적 감정 표현의 특징

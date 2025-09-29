@@ -39,6 +39,43 @@ const EMOTION_TYPES = {
   indifferent: { label: '무관심', intensity: 'low', category: 'neutral' }
 };
 
+// 확장 감정을 표준 5가지 감정으로 매핑
+function mapToStandardEmotion(advancedEmotion) {
+  const emotionMapping = {
+    // 긍정 감정들을 happy로 매핑
+    'joy': 'happy',
+    'contentment': 'happy',
+    'gratitude': 'happy',
+    'love': 'happy',
+    'excitement': 'happy',
+    'pride': 'happy',
+    'hope': 'happy',
+    'relief': 'happy',
+
+    // 부정 감정들을 각각 해당하는 표준 감정으로 매핑
+    'sadness': 'sad',
+    'grief': 'sad',
+    'anger': 'angry',
+    'frustration': 'angry',
+    'anxiety': 'anxious',
+    'fear': 'anxious',
+    'guilt': 'anxious',
+    'shame': 'anxious',
+    'loneliness': 'sad',
+    'disappointment': 'sad',
+
+    // 중성 감정들을 neutral로 매핑
+    'calm': 'neutral',
+    'contemplative': 'neutral',
+    'curious': 'neutral',
+    'nostalgic': 'neutral',
+    'confused': 'neutral',
+    'indifferent': 'neutral'
+  };
+
+  return emotionMapping[advancedEmotion] || 'neutral';
+}
+
 // 캐시에서 분석 결과 확인
 async function getCachedAnalysis(contentHash, analysisType) {
   try {

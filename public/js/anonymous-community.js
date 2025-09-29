@@ -163,7 +163,7 @@ export class AnonymousCommunity {
   }
 
   generateMockPosts() {
-    const emotions = ['joy', 'sadness', 'anxiety', 'contentment', 'hope', 'loneliness'];
+    const emotions = ['happy', 'sad', 'angry', 'anxious', 'neutral'];
     const contents = [
       '오늘 정말 좋은 일이 있었어요. 힘든 시기를 보내고 있는 분들도 희망을 잃지 마세요.',
       '요즘 너무 외로워요. 비슷한 감정을 느끼는 분들이 계실까요?',
@@ -708,6 +708,90 @@ export class AnonymousCommunity {
       notification.classList.remove('show');
       setTimeout(() => notification.remove(), 300);
     }, 3000);
+  }
+
+  async loadMorePosts() {
+    if (this.isLoading) return;
+
+    this.isLoading = true;
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+      loadMoreBtn.textContent = '로딩 중...';
+      loadMoreBtn.disabled = true;
+    }
+
+    try {
+      const token = localStorage.getItem('supabase.auth.token');
+      if (!token) {
+        this.showNotification('로그인이 필요합니다.', 'warning');
+        return;
+      }
+
+      // 로컬 환경에서는 더 보기 기능 시뮬레이션
+      const isLocal = window.location.hostname === 'localhost' ||
+                     window.location.hostname === '127.0.0.1' ||
+                     window.location.protocol === 'file:';
+
+      if (isLocal) {
+        // 추가 모의 데이터 생성
+        const moreMockPosts = this.generateMockPosts().slice(5, 10);
+        this.posts.push(...moreMockPosts);
+        this.displayPosts();
+
+        // 더 이상 로드할 데이터가 없다고 가정
+        const loadMoreContainer = document.getElementById('load-more-container');
+        if (loadMoreContainer) {
+          loadMoreContainer.style.display = 'none';
+        }
+        return;
+      }
+
+      const offset = this.posts.length;
+      const url = `/.netlify/functions/anonymous-community?action=get_posts&offset=${offset}&limit=10${this.currentFilter ? `&emotion=${this.currentFilter}` : ''}`;
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('게시물 로딩에 실패했습니다.');
+      }
+
+      const data = await response.json();
+
+      if (data.posts && data.posts.length > 0) {
+        this.posts.push(...data.posts);
+        this.displayPosts();
+
+        // 더 이상 로드할 데이터가 없으면 버튼 숨기기
+        if (data.posts.length < 10) {
+          const loadMoreContainer = document.getElementById('load-more-container');
+          if (loadMoreContainer) {
+            loadMoreContainer.style.display = 'none';
+          }
+        }
+      } else {
+        const loadMoreContainer = document.getElementById('load-more-container');
+        if (loadMoreContainer) {
+          loadMoreContainer.style.display = 'none';
+        }
+        this.showNotification('더 이상 게시물이 없습니다.', 'info');
+      }
+
+    } catch (error) {
+      console.error('더 보기 로딩 오류:', error);
+      this.showNotification('게시물 로딩에 실패했습니다.', 'error');
+    } finally {
+      this.isLoading = false;
+      if (loadMoreBtn) {
+        loadMoreBtn.textContent = '더 보기';
+        loadMoreBtn.disabled = false;
+      }
+    }
   }
 }
 

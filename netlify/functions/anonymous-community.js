@@ -162,7 +162,7 @@ async function getPersonalizedPosts(userId, limit = 10) {
 
     // 사용자가 우울한 상태라면 긍정적인 게시물 우선 추천
     if (avgMoodScore < -20) {
-      query = query.or(`emotion_category.in.(joy,contentment,gratitude,hope),is_featured.eq.true`);
+      query = query.or(`emotion_category.in.(happy,neutral),is_featured.eq.true`);
     } else if (userEmotionTypes.length > 0) {
       // 유사한 감정의 게시물 추천
       query = query.in('emotion_category', userEmotionTypes);

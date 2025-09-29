@@ -145,7 +145,7 @@ export class EmotionPrediction {
   }
 
   generateMockPredictions() {
-    const emotions = ['contentment', 'joy', 'calm', 'anxiety', 'sadness', 'hope', 'frustration'];
+    const emotions = ['happy', 'sad', 'angry', 'anxious', 'neutral'];
     const predictions = [];
 
     for (let i = 1; i <= 7; i++) {
