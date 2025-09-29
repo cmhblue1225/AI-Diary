@@ -30,12 +30,7 @@
 - 감정 공유 및 공감 기능
 - 안전한 소통 공간
 
-### 4. 전문가 상담 매칭
-- AI 기반 상담 요구사항 분석
-- 전문가 추천 알고리즘
-- 온라인 상담 예약 시스템
-
-### 5. UI/UX 개선
+### 4. UI/UX 개선
 - 상단 네비게이션 바로 통일
 - 반응형 디자인 최적화
 - 모든 페이지 일관된 디자인 시스템
@@ -62,7 +57,6 @@ newEmotionProject/
 │   │   ├── write-diary.html        # 멀티모달 일기 작성
 │   │   ├── my-diary.html           # 내 일기 목록
 │   │   ├── anonymous-community.html # 익명 커뮤니티
-│   │   ├── expert-consultation.html # 전문가 상담 매칭
 │   │   ├── chat.html               # AI 채팅
 │   │   ├── stats.html              # AI 감정 분석 대시보드
 │   │   ├── my-page.html            # 마이페이지
@@ -80,18 +74,16 @@ newEmotionProject/
 │       ├── multimodal-diary.js     # 멀티모달 일기 (639줄)
 │       ├── emotion-prediction.js   # 감정 예측 시스템 (655줄)
 │       ├── anonymous-community.js  # 익명 커뮤니티 (714줄)
-│       ├── expert-consultation.js  # 전문가 상담 (619줄)
 │       ├── ai-dashboard.js         # AI 대시보드 및 통계
 │       ├── enhanced-emotion.js     # 고급 감정 분석
 │       ├── notification-system.js  # 실시간 알림
 │       ├── offline-storage.js      # 오프라인 저장
 │       └── [12개 추가 모듈]         # 기타 기능 모듈들
 ├── netlify/
-│   └── functions/              # Serverless Functions (12개)
+│   └── functions/              # Serverless Functions (10개)
 │       ├── multimodal-analysis.js  # 멀티모달 AI 분석
 │       ├── emotion-prediction.js   # 7일 감정 예측
 │       ├── anonymous-community.js  # 익명 커뮤니티 API
-│       ├── expert-matching.js      # 전문가 매칭 알고리즘
 │       ├── advanced-emotion-analysis.js # 고급 감정 분석
 │       ├── ai-chat-streaming.js    # AI 스트리밍 채팅
 │       ├── emotion-summary.js      # 감정 요약
@@ -110,7 +102,7 @@ newEmotionProject/
 ### 🔢 프로젝트 규모 통계
 - **총 HTML 페이지**: 26개
 - **JavaScript 모듈**: 22개 (약 5,000줄)
-- **Netlify Functions**: 12개
+- **Netlify Functions**: 10개
 - **총 프로젝트 파일**: 60개 이상
 
 ## 🗄️ 데이터베이스 스키마 (Phase 2)
@@ -126,8 +118,6 @@ newEmotionProject/
 - `emotion_predictions`: 7일 감정 예측
 - `anonymous_posts`: 익명 게시글
 - `anonymous_comments`: 익명 댓글
-- `expert_profiles`: 전문가 프로필
-- `expert_consultations`: 상담 예약
 - `analysis_metrics`: 분석 지표
 - `ai_personalization`: 개인화 설정
 
@@ -267,7 +257,7 @@ Build settings:
    - 일관된 색상 팔레트 적용
 
 3. **Netlify Functions 배포 최적화**
-   - 12개 서버리스 함수 안정화
+   - 10개 서버리스 함수 안정화
    - CORS 및 환경변수 설정 완료
    - 에러 핸들링 및 로깅 개선
 
@@ -342,7 +332,6 @@ Build settings:
 
 3. **커뮤니티 기능** (100% 완성)
    - 익명 감정 공유 시스템
-   - 전문가 상담 매칭
    - 실시간 알림 시스템
 
 4. **PWA 및 UX** (100% 완성)
