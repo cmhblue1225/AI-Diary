@@ -5,383 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>익명 감정 커뮤니티 - 한 숨의 위로</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'emotion-happy': '#10B981',
+                        'emotion-sad': '#3B82F6',
+                        'emotion-angry': '#EF4444',
+                        'emotion-anxious': '#F59E0B',
+                        'emotion-neutral': '#6B7280'
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'bounce-in': 'bounceIn 0.6s ease-out'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .community-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
-        .community-header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
             color: white;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
         }
 
-        .community-tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #e9ecef;
+        .notification.show {
+            transform: translateX(0);
         }
 
-        .tab-btn {
-            padding: 12px 24px;
-            border: none;
-            background: none;
+        .notification.success { background: #10B981; }
+        .notification.error { background: #EF4444; }
+        .notification.warning { background: #F59E0B; }
+        .notification.info { background: #3B82F6; }
+
+        .ai-feedback details {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .ai-feedback summary {
             cursor: pointer;
-            font-size: 16px;
-            color: #6c757d;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
+            font-weight: 600;
+            color: #374151;
+            padding: 8px 0;
         }
 
-        .tab-btn.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .emotion-filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-
-        .emotion-filter {
-            padding: 8px 16px;
-            border: 2px solid #dee2e6;
-            background: white;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-
-        .emotion-filter:hover,
-        .emotion-filter.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .post-creation {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .post-input {
-            width: 100%;
-            min-height: 100px;
-            padding: 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            resize: vertical;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .post-input:focus {
-            border-color: #667eea;
-            outline: none;
-        }
-
-        .post-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .emotion-selector {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-
-        .emotion-btn {
-            padding: 6px 12px;
-            border: 1px solid #dee2e6;
-            background: white;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s;
-        }
-
-        .emotion-btn.selected {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .posts-container {
-            display: grid;
-            gap: 20px;
-        }
-
-        .post-card {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .post-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        }
-
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .post-author {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .anonymous-avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-
-        .post-meta {
-            text-align: right;
-            font-size: 12px;
-            color: #6c757d;
-        }
-
-        .post-emotion {
-            display: inline-block;
-            padding: 4px 8px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-
-        .post-content {
+        .feedback-content {
+            margin-top: 12px;
             line-height: 1.6;
-            margin-bottom: 15px;
-            color: #333;
+            color: #4b5563;
         }
 
-        .post-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-bottom: 15px;
+        .music-recommendation {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 12px 0;
         }
 
-        .post-tag {
-            padding: 2px 8px;
-            background: #e9ecef;
-            border-radius: 8px;
-            font-size: 11px;
-            color: #6c757d;
-        }
-
-        .post-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .post-stats {
-            display: flex;
-            gap: 15px;
-            font-size: 14px;
-            color: #6c757d;
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .post-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .action-btn {
-            padding: 6px 12px;
-            border: 1px solid #dee2e6;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s;
-        }
-
-        .action-btn:hover {
-            background: #f8f9fa;
-        }
-
-        .action-btn.liked {
-            background: #ff6b9d;
-            color: white;
-            border-color: #ff6b9d;
-        }
-
-        .comments-section {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #e9ecef;
-            display: none;
-        }
-
-        .comments-section.show {
-            display: block;
-        }
-
-        .comment-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            resize: none;
-            height: 60px;
-        }
-
-        .comments-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .comment-item {
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
+        .music-header {
+            font-weight: 600;
+            color: #92400e;
             margin-bottom: 8px;
         }
 
-        .comment-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-
-        .comment-author {
-            font-size: 12px;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .comment-time {
-            font-size: 11px;
-            color: #6c757d;
-        }
-
-        .comment-content {
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .seeking-advice {
-            border-left: 4px solid #ff9f40;
-            background: #fff3cd;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-        }
-
-        .no-posts {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-        }
-
-        .floating-compose {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .music-link {
+            display: inline-block;
+            background: #d97706;
             color: white;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            transition: transform 0.3s;
-            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.3s;
         }
 
-        .floating-compose:hover {
-            transform: scale(1.1);
-        }
-
-        @media (max-width: 768px) {
-            .community-container {
-                padding: 10px;
-            }
-
-            .post-controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .emotion-selector {
-                justify-content: center;
-            }
-
-            .post-actions {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .post-stats {
-                justify-content: center;
-            }
-
-            .post-buttons {
-                justify-content: center;
-            }
+        .music-link:hover {
+            background: #b45309;
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="dashboard.html" class="nav-brand">🌙 한 숨의 위로</a>
@@ -408,99 +149,195 @@
         </div>
     </nav>
 
-    <div class="container">
-        <div class="community-container">
-            <div class="community-header">
-                <h1>🤝 익명 감정 커뮤니티</h1>
-                <p>서로의 감정을 나누고 위로하는 안전한 공간입니다</p>
-                <p><strong>내 익명 ID:</strong> <span id="my-anonymous-id">로딩 중...</span></p>
-            </div>
-
-            <div class="community-tabs">
-                <button class="tab-btn active" data-tab="explore">💫 둘러보기</button>
-                <button class="tab-btn" data-tab="compose">✍️ 글 작성</button>
-                <button class="tab-btn" data-tab="my-posts">📝 내 글</button>
-            </div>
-
-            <!-- 둘러보기 탭 -->
-            <div id="explore-tab" class="tab-content active">
-                <div class="emotion-filters">
-                    <div class="emotion-filter active" data-emotion="">🌟 전체</div>
-                    <div class="emotion-filter" data-emotion="happy">😊 행복</div>
-                    <div class="emotion-filter" data-emotion="sad">😢 슬픔</div>
-                    <div class="emotion-filter" data-emotion="angry">😠 분노</div>
-                    <div class="emotion-filter" data-emotion="anxious">😟 불안</div>
-                    <div class="emotion-filter" data-emotion="neutral">😐 보통</div>
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto px-4 py-6 pt-24">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="gradient-bg rounded-2xl p-8 text-white mb-6 animate-fade-in">
+                <h1 class="text-3xl font-bold mb-2">🌍 익명 감정 커뮤니티</h1>
+                <p class="text-lg opacity-90">따뜻한 공감과 위로를 나누는 안전한 공간</p>
+                <div class="mt-4 text-sm opacity-80">
+                    🤗 익명성이 보장되는 안전한 소통 · 🎵 AI 추천 음악 공유 · 💭 진솔한 감정 표현
                 </div>
+            </div>
+        </div>
 
-                <div id="posts-container" class="posts-container">
-                    <div class="loading">
-                        <p>게시물을 불러오는 중...</p>
+        <!-- Tab Navigation -->
+        <div class="flex justify-center mb-8">
+            <div class="bg-white rounded-full p-1 shadow-lg">
+                <button class="tab-btn active px-6 py-3 rounded-full text-sm font-medium transition-all duration-300" data-tab="explore">
+                    🔍 둘러보기
+                </button>
+                <button class="tab-btn px-6 py-3 rounded-full text-sm font-medium transition-all duration-300" data-tab="compose">
+                    ✍️ 글쓰기
+                </button>
+                <button class="tab-btn px-6 py-3 rounded-full text-sm font-medium transition-all duration-300" data-tab="my-posts">
+                    📝 내 글
+                </button>
+            </div>
+        </div>
+
+        <!-- Explore Tab -->
+        <div id="explore-tab" class="tab-content active">
+            <!-- Emotion Filters -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm mb-6 animate-slide-up">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">🎭 감정으로 찾아보기</h3>
+                <div class="flex flex-wrap gap-3">
+                    <button class="emotion-filter active px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 bg-indigo-100 text-indigo-700 border-2 border-indigo-200" data-emotion="">
+                        🌟 전체
+                    </button>
+                    <button class="emotion-filter px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:bg-emotion-happy hover:text-white border-2 border-gray-200" data-emotion="happy">
+                        😊 행복
+                    </button>
+                    <button class="emotion-filter px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:bg-emotion-sad hover:text-white border-2 border-gray-200" data-emotion="sad">
+                        😢 슬픔
+                    </button>
+                    <button class="emotion-filter px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:bg-emotion-angry hover:text-white border-2 border-gray-200" data-emotion="angry">
+                        😠 분노
+                    </button>
+                    <button class="emotion-filter px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:bg-emotion-anxious hover:text-white border-2 border-gray-200" data-emotion="anxious">
+                        😟 불안
+                    </button>
+                    <button class="emotion-filter px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:bg-emotion-neutral hover:text-white border-2 border-gray-200" data-emotion="neutral">
+                        😐 보통
+                    </button>
+                </div>
+            </div>
+
+            <!-- Posts Container -->
+            <div id="posts-container" class="space-y-6">
+                <!-- Posts will be loaded here -->
+            </div>
+
+            <!-- Load More Button -->
+            <div id="load-more-container" class="text-center mt-8">
+                <button id="load-more-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105">
+                    더 보기
+                </button>
+            </div>
+        </div>
+
+        <!-- Compose Tab -->
+        <div id="compose-tab" class="tab-content">
+            <div class="bg-white rounded-2xl p-8 shadow-lg animate-bounce-in">
+                <h3 class="text-2xl font-bold mb-6 text-gray-800 text-center">✍️ 마음을 나누어보세요</h3>
+
+                <!-- Emotion Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">현재 감정을 선택해주세요</label>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="emotion-btn px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 border-2 border-gray-200 hover:scale-105" data-emotion="happy">
+                            😊 행복
+                        </button>
+                        <button class="emotion-btn px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 border-2 border-gray-200 hover:scale-105" data-emotion="sad">
+                            😢 슬픔
+                        </button>
+                        <button class="emotion-btn px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 border-2 border-gray-200 hover:scale-105" data-emotion="angry">
+                            😠 분노
+                        </button>
+                        <button class="emotion-btn px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 border-2 border-gray-200 hover:scale-105" data-emotion="anxious">
+                            😟 불안
+                        </button>
+                        <button class="emotion-btn px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 border-2 border-gray-200 hover:scale-105" data-emotion="neutral">
+                            😐 보통
+                        </button>
                     </div>
                 </div>
 
-                <div id="load-more-container" style="text-align: center; margin-top: 20px; display: none;">
-                    <button id="load-more-btn" class="btn btn-outline">더 보기</button>
+                <!-- Content Input -->
+                <div class="mb-6">
+                    <label for="new-post-content" class="block text-sm font-medium text-gray-700 mb-3">당신의 이야기를 들려주세요</label>
+                    <textarea id="new-post-content"
+                             class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-300 resize-none"
+                             rows="5"
+                             placeholder="익명으로 안전하게 마음을 표현해보세요. 여기는 판단 없는 공간입니다..."></textarea>
+                </div>
+
+                <!-- Options -->
+                <div class="mb-6">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="seeking-advice" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500">
+                        <span class="text-sm font-medium text-gray-700">💡 조언을 구하고 있어요</span>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button id="post-submit-btn" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        🚀 게시하기
+                    </button>
                 </div>
             </div>
+        </div>
 
-            <!-- 글 작성 탭 -->
-            <div id="compose-tab" class="tab-content">
-                <div class="post-creation">
-                    <h3>✍️ 새 글 작성</h3>
-                    <p style="color: #6c757d; margin-bottom: 20px;">
-                        익명으로 안전하게 감정을 나눠보세요. 개인정보는 절대 공개되지 않습니다.
-                    </p>
-
-                    <textarea id="new-post-content" class="post-input" placeholder="어떤 감정을 느끼고 계신가요? 자유롭게 나눠주세요..."></textarea>
-
-                    <div class="post-controls">
-                        <div>
-                            <label style="margin-bottom: 10px; display: block; font-weight: bold;">현재 감정:</label>
-                            <div class="emotion-selector">
-                                <button class="emotion-btn" data-emotion="happy">😊 행복</button>
-                                <button class="emotion-btn" data-emotion="sad">😢 슬픔</button>
-                                <button class="emotion-btn" data-emotion="angry">😠 분노</button>
-                                <button class="emotion-btn" data-emotion="anxious">😟 불안</button>
-                                <button class="emotion-btn" data-emotion="neutral">😐 보통</button>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <label style="display: flex; align-items: center; gap: 5px;">
-                                <input type="checkbox" id="seeking-advice">
-                                <span>조언을 구합니다</span>
-                            </label>
-                            <button id="post-submit-btn" class="btn btn-primary">게시하기</button>
-                        </div>
-                    </div>
-                </div>
+        <!-- My Posts Tab -->
+        <div id="my-posts-tab" class="tab-content">
+            <div class="text-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">📝 내가 작성한 글들</h3>
+                <p class="text-gray-600 mt-2">익명 ID: <span id="my-anonymous-id" class="font-mono text-indigo-600"></span></p>
             </div>
-
-            <!-- 내 글 탭 -->
-            <div id="my-posts-tab" class="tab-content">
-                <div id="my-posts-container" class="posts-container">
-                    <div class="loading">
-                        <p>내 글을 불러오는 중...</p>
-                    </div>
-                </div>
+            <div id="my-posts-container">
+                <!-- My posts will be loaded here -->
             </div>
         </div>
     </div>
 
-    <!-- 플로팅 작성 버튼 -->
-    <div class="floating-compose" id="floating-compose" title="새 글 작성">
-        ✍️
-    </div>
+    <!-- Floating Compose Button -->
+    <button id="floating-compose" class="fixed bottom-6 right-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white w-16 h-16 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 z-50 lg:hidden">
+        <span class="text-2xl">✍️</span>
+    </button>
 
-    <script type="module" src="js/supabase.js"></script>
-    <script type="module" src="js/auth.js"></script>
-    <script type="module" src="js/anonymous-community.js"></script>
     <script type="module">
+        import { supabase } from './js/supabase.js';
+        import { checkAuth } from './js/auth.js';
         import { AnonymousCommunity } from './js/anonymous-community.js';
 
-        // 익명 커뮤니티 초기화 (로그인 필요 없음)
+        // 인증 체크는 선택적으로 (게스트도 열람 가능)
+        try {
+            checkAuth();
+        } catch (error) {
+            console.log('게스트 모드로 접속');
+        }
+
+        // 익명 커뮤니티 초기화
         window.anonymousCommunity = new AnonymousCommunity();
+
+        // Custom styles for emotion filters and buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Emotion filter styles
+            const style = document.createElement('style');
+            style.textContent = `
+                .emotion-filter.active {
+                    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+                    color: white !important;
+                    border-color: #667eea !important;
+                    transform: scale(1.05);
+                }
+
+                .emotion-btn.selected {
+                    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+                    color: white !important;
+                    border-color: #667eea !important;
+                    transform: scale(1.1);
+                }
+
+                .tab-btn.active {
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    color: white;
+                    transform: scale(1.05);
+                }
+
+                .tab-btn:not(.active) {
+                    color: #6b7280;
+                }
+
+                .tab-btn:not(.active):hover {
+                    color: #4b5563;
+                    background: #f9fafb;
+                }
+            `;
+            document.head.appendChild(style);
+        });
     </script>
 </body>
 </html>

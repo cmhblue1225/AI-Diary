@@ -111,53 +111,56 @@ export class AnonymousCommunity {
     try {
       // 로그인 상태 확인 (옵셔널)
       const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
+      const currentUserId = session?.user?.id;
 
-      // 로컬 개발 환경 감지 또는 로그인하지 않은 상태
-      const isLocal = window.location.hostname === 'localhost' ||
-                     window.location.hostname === '127.0.0.1' ||
-                     window.location.protocol === 'file:' ||
-                     !token; // 로그인하지 않은 경우 로컬 모드 사용
+      // 익명 ID 생성 (일관된 해싱)
+      this.myAnonymousId = currentUserId ?
+        'anon-' + currentUserId.slice(0, 8) :
+        'anon-guest-' + Math.random().toString(36).substr(2, 8);
 
-      if (isLocal) {
-        this.posts = this.generateMockPosts();
-        this.myAnonymousId = token ? 'anon_demo_user' : 'anon_guest_' + Math.random().toString(36).substr(2, 8);
-        this.displayPosts();
-        this.updateAnonymousId();
-        return;
-      }
+      // shared_diaries 테이블에서 데이터 가져오기
+      let query = supabase
+        .from('shared_diaries')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20);
 
-      const params = new URLSearchParams({
-        action: 'posts',
-        limit: '10'
-      });
-
+      // 감정 필터 적용
       if (this.currentFilter) {
-        params.append('emotion', this.currentFilter);
+        query = query.eq('emotion', this.currentFilter);
       }
 
-      const response = await fetch(`/.netlify/functions/anonymous-community?${params}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const { data: sharedDiaries, error } = await query;
 
-      if (!response.ok) {
-        throw new Error('게시물 로드 실패');
+      if (error) {
+        throw new Error('게시물 로드 실패: ' + error.message);
       }
 
-      const data = await response.json();
-      this.posts = data.posts || [];
-      this.myAnonymousId = data.user_anonymous_id || '';
+      // shared_diaries 데이터를 커뮤니티 포스트 형식으로 변환
+      this.posts = sharedDiaries.map(diary => ({
+        id: diary.id,
+        anonymous_id: 'anon-' + diary.user_id.slice(0, 8),
+        emotion_category: diary.emotion,
+        content: diary.content,
+        feedback: diary.feedback,
+        music: diary.music,
+        tags: diary.ai_generated_tags || ['일상', '감정'],
+        is_seeking_advice: false, // 기본값
+        like_count: diary.likes || 0,
+        comment_count: 0, // 추후 구현
+        view_count: Math.floor(Math.random() * 50) + 10, // 임시값
+        created_at: diary.created_at
+      }));
+
       this.displayPosts();
       this.updateAnonymousId();
 
     } catch (error) {
       console.error('게시물 로드 오류:', error);
-      this.showNotification('게시물을 불러오는데 실패했습니다.', 'error');
-      this.displayError('게시물을 불러올 수 없습니다.');
+      // Fallback to mock data if database fails
+      this.posts = this.generateMockPosts();
+      this.displayPosts();
+      this.showNotification('일부 게시물을 불러오는데 문제가 있었습니다.', 'warning');
     } finally {
       this.isLoading = false;
     }
@@ -218,65 +221,110 @@ export class AnonymousCommunity {
     const emotionInfo = this.getEmotionInfo(post.emotion_category);
 
     return `
-      <div class="post-card ${post.is_seeking_advice ? 'seeking-advice' : ''}" data-post-id="${post.id}">
-        <div class="post-header">
-          <div class="post-author">
-            <div class="anonymous-avatar">${post.anonymous_id.slice(-2).toUpperCase()}</div>
+      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-fade-in ${post.is_seeking_advice ? 'border-l-4 border-yellow-400' : ''}" data-post-id="${post.id}">
+        <!-- Post Header -->
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+              ${post.anonymous_id.slice(-2).toUpperCase()}
+            </div>
             <div>
-              <div style="font-weight: bold; color: ${isMyPost ? '#667eea' : '#333'};">
-                ${isMyPost ? '나' : post.anonymous_id}
+              <div class="font-semibold ${isMyPost ? 'text-indigo-600' : 'text-gray-800'}">
+                ${isMyPost ? '🫵 나' : post.anonymous_id}
               </div>
-              <div class="post-emotion" style="background-color: ${emotionInfo.color}20; color: ${emotionInfo.color};">
+              <div class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" style="background-color: ${emotionInfo.color}20; color: ${emotionInfo.color};">
                 ${emotionInfo.icon} ${emotionInfo.name}
               </div>
             </div>
           </div>
-          <div class="post-meta">
+          <div class="text-right text-sm text-gray-500">
             <div>${timeAgo}</div>
-            ${post.is_seeking_advice ? '<div style="color: #ff9f40;">💡 조언 구함</div>' : ''}
+            ${post.is_seeking_advice ? '<div class="text-yellow-600 text-xs mt-1">💡 조언 구함</div>' : ''}
           </div>
         </div>
 
-        <div class="post-content">${post.content}</div>
+        <!-- Post Content -->
+        <div class="text-gray-800 leading-relaxed mb-4 text-base">
+          ${post.content}
+        </div>
 
-        ${post.tags && post.tags.length > 0 ? `
-          <div class="post-tags">
-            ${post.tags.map(tag => `<span class="post-tag">#${tag}</span>`).join('')}
+        <!-- AI Feedback -->
+        ${post.feedback && post.feedback !== '감정 분석 실패' ? `
+          <div class="ai-feedback mb-4">
+            <details class="group">
+              <summary class="cursor-pointer text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors flex items-center space-x-2">
+                <span>🤖 AI 피드백 보기</span>
+                <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </summary>
+              <div class="feedback-content mt-3 text-sm leading-relaxed">${post.feedback}</div>
+            </details>
           </div>
         ` : ''}
 
-        <div class="post-actions">
-          <div class="post-stats">
-            <div class="stat-item">
+        <!-- Music Recommendation -->
+        ${post.music ? `
+          <div class="music-recommendation mb-4">
+            <div class="music-header text-sm font-medium mb-2">🎵 추천 음악</div>
+            <div class="music-content">
+              <a href="${post.music}" target="_blank" class="music-link inline-block">🎶 음악 들으러 가기</a>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Tags -->
+        ${post.tags && post.tags.length > 0 ? `
+          <div class="flex flex-wrap gap-2 mb-4">
+            ${post.tags.map(tag => `
+              <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                #${tag}
+              </span>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        <!-- Post Actions -->
+        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div class="flex items-center space-x-6 text-sm text-gray-500">
+            <div class="flex items-center space-x-1">
               <span>👁️</span>
               <span>${post.view_count || 0}</span>
             </div>
-            <div class="stat-item">
+            <div class="flex items-center space-x-1">
               <span>❤️</span>
               <span>${post.like_count || 0}</span>
             </div>
-            <div class="stat-item">
+            <div class="flex items-center space-x-1">
               <span>💬</span>
               <span>${post.comment_count || 0}</span>
             </div>
           </div>
 
-          <div class="post-buttons">
-            <button class="action-btn like-btn" data-action="like" data-post-id="${post.id}">
+          <div class="flex items-center space-x-3">
+            <button class="action-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200" data-action="like" data-post-id="${post.id}">
               ❤️ 좋아요
             </button>
-            <button class="action-btn comment-btn" data-action="comment" data-post-id="${post.id}">
+            <button class="action-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-indigo-500 hover:bg-indigo-50 rounded-lg transition-all duration-200" data-action="comment" data-post-id="${post.id}">
               💬 댓글
             </button>
           </div>
         </div>
 
-        <div class="comments-section" id="comments-${post.id}">
-          <textarea class="comment-input" placeholder="따뜻한 댓글을 남겨주세요..." data-post-id="${post.id}"></textarea>
-          <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-            <button class="btn btn-sm btn-primary comment-submit-btn" data-post-id="${post.id}">댓글 작성</button>
+        <!-- Comments Section -->
+        <div class="comments-section mt-4 pt-4 border-t border-gray-100 hidden" id="comments-${post.id}">
+          <div class="mb-3">
+            <textarea class="comment-input w-full p-3 border border-gray-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200 resize-none"
+                     placeholder="따뜻한 댓글을 남겨주세요..."
+                     data-post-id="${post.id}"
+                     rows="3"></textarea>
           </div>
-          <div class="comments-list" id="comments-list-${post.id}">
+          <div class="flex justify-end mb-3">
+            <button class="comment-submit-btn bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200" data-post-id="${post.id}">
+              댓글 작성
+            </button>
+          </div>
+          <div class="comments-list space-y-3" id="comments-list-${post.id}">
             <!-- 댓글들이 여기에 로드됩니다 -->
           </div>
         </div>
@@ -286,18 +334,25 @@ export class AnonymousCommunity {
 
   getEmotionInfo(emotionKey) {
     const emotions = {
-      joy: { name: '기쁨', icon: '😄', color: '#74c0fc' },
-      sadness: { name: '슬픔', icon: '😢', color: '#91a7ff' },
-      anxiety: { name: '불안', icon: '😰', color: '#ffa8a8' },
-      anger: { name: '분노', icon: '😠', color: '#ff8787' },
-      contentment: { name: '만족', icon: '😊', color: '#69db7c' },
-      loneliness: { name: '외로움', icon: '😞', color: '#c2c2f0' },
-      hope: { name: '희망', icon: '🌟', color: '#ffd43b' },
-      frustration: { name: '좌절', icon: '😤', color: '#ffb366' },
-      calm: { name: '평온', icon: '😌', color: '#91c7f2' },
-      confused: { name: '혼란', icon: '😕', color: '#d6a7ff' }
+      // 5가지 표준 감정에 맞춰 수정
+      happy: { name: '행복', icon: '😊', color: '#10B981' },
+      sad: { name: '슬픔', icon: '😢', color: '#3B82F6' },
+      angry: { name: '분노', icon: '😠', color: '#EF4444' },
+      anxious: { name: '불안', icon: '😟', color: '#F59E0B' },
+      neutral: { name: '보통', icon: '😐', color: '#6B7280' },
+      // 레거시 감정들도 매핑
+      joy: { name: '기쁨', icon: '😄', color: '#10B981' },
+      sadness: { name: '슬픔', icon: '😢', color: '#3B82F6' },
+      anxiety: { name: '불안', icon: '😰', color: '#F59E0B' },
+      anger: { name: '분노', icon: '😠', color: '#EF4444' },
+      contentment: { name: '만족', icon: '😊', color: '#10B981' },
+      loneliness: { name: '외로움', icon: '😞', color: '#3B82F6' },
+      hope: { name: '희망', icon: '🌟', color: '#10B981' },
+      frustration: { name: '좌절', icon: '😤', color: '#EF4444' },
+      calm: { name: '평온', icon: '😌', color: '#6B7280' },
+      confused: { name: '혼란', icon: '😕', color: '#6B7280' }
     };
-    return emotions[emotionKey] || { name: emotionKey, icon: '😐', color: '#868e96' };
+    return emotions[emotionKey] || { name: emotionKey, icon: '😐', color: '#6B7280' };
   }
 
   getTimeAgo(dateString) {
@@ -340,57 +395,40 @@ export class AnonymousCommunity {
 
   async likePost(postId) {
     try {
-      const token = localStorage.getItem('supabase.auth.token');
-      if (!token) {
-        this.showNotification('로그인이 필요합니다.', 'warning');
-        return;
+      // Supabase를 통해 직접 좋아요 업데이트
+      const { data: currentPost, error: fetchError } = await supabase
+        .from('shared_diaries')
+        .select('likes')
+        .eq('id', postId)
+        .single();
+
+      if (fetchError) {
+        throw new Error('게시물을 찾을 수 없습니다.');
       }
 
-      // 로컬 환경에서는 시뮬레이션
-      const isLocal = window.location.hostname === 'localhost' ||
-                     window.location.hostname === '127.0.0.1' ||
-                     window.location.protocol === 'file:';
+      const newLikeCount = (currentPost.likes || 0) + 1;
 
-      if (isLocal) {
-        // 로컬에서는 UI만 업데이트
-        const likeBtn = document.querySelector(`[data-action="like"][data-post-id="${postId}"]`);
-        if (likeBtn) {
-          likeBtn.classList.toggle('liked');
-          const statElement = likeBtn.closest('.post-card').querySelector('.stat-item:nth-child(2) span:last-child');
-          if (statElement) {
-            const currentLikes = parseInt(statElement.textContent) || 0;
-            statElement.textContent = currentLikes + 1;
-          }
-        }
-        this.showNotification('좋아요를 눌렀습니다!', 'success');
-        return;
+      const { error: updateError } = await supabase
+        .from('shared_diaries')
+        .update({ likes: newLikeCount })
+        .eq('id', postId);
+
+      if (updateError) {
+        throw new Error('좋아요 업데이트 실패');
       }
-
-      const response = await fetch('/.netlify/functions/anonymous-community', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          action: 'like_post',
-          postId: postId
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('좋아요 실패');
-      }
-
-      const data = await response.json();
 
       // UI 업데이트
       const likeBtn = document.querySelector(`[data-action="like"][data-post-id="${postId}"]`);
       if (likeBtn) {
-        likeBtn.classList.add('liked');
-        const statElement = likeBtn.closest('.post-card').querySelector('.stat-item:nth-child(2) span:last-child');
-        if (statElement) {
-          statElement.textContent = data.new_like_count;
+        likeBtn.classList.add('bg-red-100', 'text-red-600');
+        likeBtn.classList.remove('hover:text-red-500', 'hover:bg-red-50');
+        likeBtn.disabled = true; // 중복 클릭 방지
+
+        // 좋아요 개수 업데이트 (새로운 구조에 맞게 수정)
+        const postCard = likeBtn.closest('[data-post-id]');
+        const likeCountElement = postCard.querySelector('.flex.items-center.space-x-1:nth-child(2) span:last-child');
+        if (likeCountElement) {
+          likeCountElement.textContent = newLikeCount;
         }
       }
 
@@ -398,16 +436,16 @@ export class AnonymousCommunity {
 
     } catch (error) {
       console.error('좋아요 오류:', error);
-      this.showNotification('좋아요에 실패했습니다.', 'error');
+      this.showNotification('좋아요에 실패했습니다. ' + error.message, 'error');
     }
   }
 
   toggleComments(postId) {
     const commentsSection = document.getElementById(`comments-${postId}`);
     if (commentsSection) {
-      commentsSection.classList.toggle('show');
+      commentsSection.classList.toggle('hidden');
 
-      if (commentsSection.classList.contains('show')) {
+      if (!commentsSection.classList.contains('hidden')) {
         this.loadComments(postId);
       }
     }
@@ -562,46 +600,32 @@ export class AnonymousCommunity {
     }
 
     try {
-      const token = localStorage.getItem('supabase.auth.token');
-      if (!token) {
+      // Supabase를 통해 직접 shared_diaries 테이블에 저장
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+
+      if (!userId) {
         this.showNotification('로그인이 필요합니다.', 'warning');
         return;
       }
 
-      // 로컬 환경에서는 시뮬레이션
-      const isLocal = window.location.hostname === 'localhost' ||
-                     window.location.hostname === '127.0.0.1' ||
-                     window.location.protocol === 'file:';
-
-      if (isLocal) {
-        // 입력 필드 초기화
-        document.getElementById('new-post-content').value = '';
-        document.getElementById('seeking-advice').checked = false;
-        document.querySelectorAll('.emotion-btn').forEach(btn => btn.classList.remove('selected'));
-        this.selectedEmotion = '';
-
-        this.showNotification('글이 성공적으로 게시되었습니다!', 'success');
-        this.switchToTab('explore');
-        return;
-      }
-
-      const response = await fetch('/.netlify/functions/anonymous-community', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          action: 'create_post',
+      // shared_diaries 테이블에 새 게시물 삽입
+      const { data, error } = await supabase
+        .from('shared_diaries')
+        .insert({
+          user_id: userId,
+          emotion: this.selectedEmotion,
           content: content,
-          emotion_category: this.selectedEmotion,
-          is_seeking_advice: seekingAdvice
+          feedback: null, // 커뮤니티에서 직접 작성한 글은 AI 피드백 없음
+          music: null,
+          likes: 0,
+          ai_generated_tags: ['커뮤니티', '익명', '감정']
         })
-      });
+        .select()
+        .single();
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || '게시 실패');
+      if (error) {
+        throw new Error('게시물 저장 실패: ' + error.message);
       }
 
       // 성공 처리
