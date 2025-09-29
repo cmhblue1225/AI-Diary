@@ -497,13 +497,9 @@
     <script type="module" src="js/auth.js"></script>
     <script type="module" src="js/anonymous-community.js"></script>
     <script type="module">
-        import { checkAuth } from './js/auth.js';
         import { AnonymousCommunity } from './js/anonymous-community.js';
 
-        // 인증 확인
-        checkAuth();
-
-        // 익명 커뮤니티 초기화
+        // 익명 커뮤니티 초기화 (로그인 필요 없음)
         window.anonymousCommunity = new AnonymousCommunity();
     </script>
 </body>

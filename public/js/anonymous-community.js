@@ -1,5 +1,7 @@
 // Phase 2: 익명 감정 커뮤니티 클라이언트
 
+import { supabase } from './supabase.js';
+
 export class AnonymousCommunity {
   constructor() {
     this.posts = [];
@@ -107,20 +109,19 @@ export class AnonymousCommunity {
     }
 
     try {
-      const token = localStorage.getItem('supabase.auth.token');
-      if (!token) {
-        this.showNotification('로그인이 필요합니다.', 'warning');
-        return;
-      }
+      // 로그인 상태 확인 (옵셔널)
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      // 로컬 개발 환경 감지
+      // 로컬 개발 환경 감지 또는 로그인하지 않은 상태
       const isLocal = window.location.hostname === 'localhost' ||
                      window.location.hostname === '127.0.0.1' ||
-                     window.location.protocol === 'file:';
+                     window.location.protocol === 'file:' ||
+                     !token; // 로그인하지 않은 경우 로컬 모드 사용
 
       if (isLocal) {
         this.posts = this.generateMockPosts();
-        this.myAnonymousId = 'anon_demo_user';
+        this.myAnonymousId = token ? 'anon_demo_user' : 'anon_guest_' + Math.random().toString(36).substr(2, 8);
         this.displayPosts();
         this.updateAnonymousId();
         return;
@@ -533,6 +534,14 @@ export class AnonymousCommunity {
   }
 
   async createPost() {
+    // 로그인 상태 확인
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      this.showNotification('글 작성은 로그인 후 이용할 수 있습니다.', 'warning');
+      window.location.href = 'login.html';
+      return;
+    }
+
     const content = document.getElementById('new-post-content').value.trim();
     const seekingAdvice = document.getElementById('seeking-advice').checked;
 
@@ -623,19 +632,19 @@ export class AnonymousCommunity {
     container.innerHTML = '<div class="loading"><p>내 글을 불러오는 중...</p></div>';
 
     try {
-      const token = localStorage.getItem('supabase.auth.token');
-      if (!token) {
-        this.showNotification('로그인이 필요합니다.', 'warning');
-        return;
-      }
+      // 로그인 상태 확인 (옵셔널)
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      // 로컬 환경에서는 모의 데이터
+      // 로컬 환경이거나 로그인하지 않은 경우 모의 데이터 사용
       const isLocal = window.location.hostname === 'localhost' ||
                      window.location.hostname === '127.0.0.1' ||
-                     window.location.protocol === 'file:';
+                     window.location.protocol === 'file:' ||
+                     !token;
 
       if (isLocal) {
-        this.myPosts = this.generateMockPosts().filter(post => post.anonymous_id === 'anon_demo_user');
+        this.myPosts = this.generateMockPosts().filter(post =>
+          post.anonymous_id === (this.myAnonymousId || 'anon_demo_user'));
         this.displayMyPosts();
         return;
       }
