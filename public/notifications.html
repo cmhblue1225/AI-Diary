@@ -3,44 +3,100 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>알림</title>
+  <title>알림 - 한 숨의 위로</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'emotion-happy': '#10B981',
+            'emotion-sad': '#3B82F6',
+            'emotion-angry': '#EF4444',
+            'emotion-anxious': '#F59E0B',
+            'emotion-neutral': '#6B7280'
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'slide-up': 'slideUp 0.4s ease-out',
+            'bounce-in': 'bounceIn 0.6s ease-out'
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body {
-      font-family: sans-serif;
-      background-color: #f8f9fa;
-      padding: 2rem;
-      max-width: 600px;
-      margin: auto;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 1.5rem;
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .notification {
-      background-color: #fff;
-      border: 1px solid #dee2e6;
-      border-radius: 10px;
-      padding: 1rem;
-      margin-bottom: 1rem;
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0.3); }
+      50% { opacity: 1; transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
-    .notification.unread {
-      border-left: 6px solid #339af0;
-      background-color: #e7f5ff;
-    }
-
-    .timestamp {
-      font-size: 0.85rem;
-      color: #888;
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
   </style>
 </head>
-<body>
-  <h1>🔔 내 알림</h1>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="dashboard.html" class="nav-brand">🌙 한 숨의 위로</a>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">대시보드</a>
+        </li>
+        <li class="nav-item">
+          <a href="write-diary.html" class="nav-link">일기 작성</a>
+        </li>
+        <li class="nav-item">
+          <a href="my-diary.html" class="nav-link">내 일기</a>
+        </li>
+        <li class="nav-item">
+          <a href="anonymous-community.html" class="nav-link">익명 커뮤니티</a>
+        </li>
+        <li class="nav-item">
+          <a href="stats.html" class="nav-link">통계</a>
+        </li>
+        <li class="nav-item">
+          <a href="my-page.html" class="nav-link">마이페이지</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 
-  <div id="notifications-box">불러오는 중...</div>
+  <!-- Main Container -->
+  <div class="max-w-4xl mx-auto px-4 py-6 pt-24">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="gradient-bg rounded-2xl p-8 text-white mb-6 animate-fade-in">
+        <h1 class="text-3xl font-bold mb-2">🔔 내 알림</h1>
+        <p class="text-lg opacity-90">새로운 소식과 업데이트를 확인하세요</p>
+        <div class="mt-4 text-sm opacity-80">
+          💬 댓글 알림 · ❤️ 좋아요 알림 · 🔄 시스템 업데이트
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications List -->
+    <div id="notifications-box" class="animate-slide-up">
+      <div class="text-center py-12">
+        <div class="animate-spin w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <p class="text-gray-500">알림을 불러오는 중...</p>
+      </div>
+    </div>
+  </div>
 
   <script type="module">
     import { supabase } from './js/supabase.js';
@@ -60,19 +116,61 @@
         .order('created_at', { ascending: false });
 
       if (error || !data || data.length === 0) {
-        box.innerHTML = '<p>알림이 없습니다.</p>';
+        box.innerHTML = `
+          <div class="text-center py-16">
+            <div class="text-6xl mb-6">🔔</div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">알림이 없습니다</h3>
+            <p class="text-gray-600">새로운 알림이 도착하면 여기에서 확인할 수 있어요!</p>
+          </div>
+        `;
         return;
       }
 
       box.innerHTML = '';
 
-      data.forEach(n => {
+      data.forEach((n, index) => {
         const div = document.createElement('div');
-        div.className = 'notification' + (!n.read ? ' unread' : '');
+        div.className = `bg-white rounded-2xl p-6 shadow-lg mb-4 animate-slide-up transition-all duration-300 hover:shadow-xl ${
+          !n.read ? 'border-l-4 border-indigo-500 bg-gradient-to-r from-indigo-50 to-purple-50' : ''
+        }`;
+        div.style.animationDelay = `${index * 0.1}s`;
+
+        const notificationIcons = {
+          'like': '❤️',
+          'comment': '💬',
+          'system': '🔄',
+          'community': '👥'
+        };
+
+        const notificationType = n.type || 'system';
+        const icon = notificationIcons[notificationType] || '📢';
 
         div.innerHTML = `
-          <div>${n.message}</div>
-          <div class="timestamp">${new Date(n.created_at).toLocaleString()}</div>
+          <div class="flex items-start space-x-4">
+            <div class="w-12 h-12 ${
+              !n.read
+                ? 'bg-gradient-to-r from-indigo-500 to-purple-600'
+                : 'bg-gray-400'
+            } rounded-full flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+              ${icon}
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-semibold text-gray-800">알림</h3>
+                ${!n.read ? '<span class="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">새로운</span>' : ''}
+              </div>
+              <p class="text-gray-700 leading-relaxed mb-3">${n.message}</p>
+              <div class="text-sm text-gray-500">
+                ${new Date(n.created_at).toLocaleString('ko-KR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </div>
+            </div>
+          </div>
         `;
 
         box.appendChild(div);

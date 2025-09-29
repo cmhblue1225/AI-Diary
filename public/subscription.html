@@ -3,83 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>구독한 유저 공유 일기</title>
+  <title>구독한 유저 공유 일기 - 한 숨의 위로</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'emotion-happy': '#10B981',
+            'emotion-sad': '#3B82F6',
+            'emotion-angry': '#EF4444',
+            'emotion-anxious': '#F59E0B',
+            'emotion-neutral': '#6B7280'
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'slide-up': 'slideUp 0.4s ease-out',
+            'bounce-in': 'bounceIn 0.6s ease-out'
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 2rem;
-      max-width: 800px;
-      margin: auto;
-      background-color: #f8f9fa;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .top-bar {
-      position: relative;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .back-btn {
-      position: absolute;
-      left: 0;
-      color: #339af0;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 1rem;
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0.3); }
+      50% { opacity: 1; transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
-    h1 {
-      margin: 0;
-      font-size: 1.5rem;
-      text-align: center;
-    }
-
-    .diary-card {
-      background-color: white;
-      border: 1px solid #ced4da;
-      border-radius: 10px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .emotion-tag {
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-    }
-
-    .music-btn {
-      margin-top: 0.5rem;
-      display: inline-block;
-      background: #74c0fc;
-      padding: 0.4rem 0.7rem;
-      border-radius: 6px;
-      color: white;
-      text-decoration: none;
-    }
-
-    .music-btn:hover {
-      background: #339af0;
-    }
-
-    .like-btn {
-      margin-left: 10px;
-      background: #ffa8a8;
-      border: none;
-      border-radius: 4px;
-      padding: 0.3rem 0.6rem;
-      cursor: pointer;
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
   </style>
 </head>
-<body>
-  <div class="top-bar">
-    <a href="my-page.html" class="back-btn">← 마이페이지로</a>
-    <h1>📩 익명 유저 공유 일기</h1>
-  </div>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="dashboard.html" class="nav-brand">🌙 한 숨의 위로</a>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">대시보드</a>
+        </li>
+        <li class="nav-item">
+          <a href="write-diary.html" class="nav-link">일기 작성</a>
+        </li>
+        <li class="nav-item">
+          <a href="my-diary.html" class="nav-link">내 일기</a>
+        </li>
+        <li class="nav-item">
+          <a href="anonymous-community.html" class="nav-link">익명 커뮤니티</a>
+        </li>
+        <li class="nav-item">
+          <a href="stats.html" class="nav-link">통계</a>
+        </li>
+        <li class="nav-item">
+          <a href="my-page.html" class="nav-link">마이페이지</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 
-  <div id="diary-list"></div>
+  <!-- Main Container -->
+  <div class="max-w-4xl mx-auto px-4 py-6 pt-24">
+    <!-- Back Button -->
+    <div class="mb-6 animate-fade-in">
+      <a href="my-page.html"
+         class="inline-flex items-center space-x-2 text-indigo-600 hover:text-indigo-700 font-medium transition-all duration-300 hover:scale-105">
+        <span>←</span>
+        <span>마이페이지로 돌아가기</span>
+      </a>
+    </div>
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="gradient-bg rounded-2xl p-8 text-white mb-6 animate-fade-in">
+        <h1 class="text-3xl font-bold mb-2">📩 구독한 유저의 일기</h1>
+        <p class="text-lg opacity-90">마음의 공명이 일어나는 특별한 이야기들</p>
+        <div class="mt-4 text-sm opacity-80">
+          💭 감정 공유 · 🤝 서로 응원 · ❤️ 마음의 위로
+        </div>
+      </div>
+    </div>
+
+    <!-- Diary List -->
+    <div id="diary-list" class="space-y-6">
+      <div class="text-center py-12">
+        <div class="animate-spin w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <p class="text-gray-500">일기를 불러오는 중...</p>
+      </div>
+    </div>
+  </div>
 
   <script type="module">
     import { supabase } from './js/supabase.js';
@@ -104,23 +130,87 @@
         .order('created_at', { ascending: false });
 
       if (error || !data || data.length === 0) {
-        diaryList.innerHTML = '<p>이 유저의 공유 일기가 없습니다.</p>';
+        diaryList.innerHTML = `
+          <div class="text-center py-16">
+            <div class="text-6xl mb-6">📝</div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">아직 공유한 일기가 없습니다</h3>
+            <p class="text-gray-600 mb-6">이 유저가 일기를 공유하면 여기에서 확인할 수 있어요!</p>
+          </div>
+        `;
         return;
       }
 
-      data.forEach(entry => {
+      diaryList.innerHTML = '';
+
+      data.forEach((entry, index) => {
         const card = document.createElement('div');
-        card.className = 'diary-card';
+        card.className = 'bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-slide-up';
+        card.style.animationDelay = `${index * 0.1}s`;
+
+        const emotionEmojis = {
+          'happy': '😊',
+          'sad': '😢',
+          'angry': '😠',
+          'anxious': '😟',
+          'neutral': '😐'
+        };
+
+        const emotionColors = {
+          'happy': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+          'sad': 'bg-blue-100 text-blue-700 border-blue-200',
+          'angry': 'bg-red-100 text-red-700 border-red-200',
+          'anxious': 'bg-amber-100 text-amber-700 border-amber-200',
+          'neutral': 'bg-gray-100 text-gray-700 border-gray-200'
+        };
+
+        const emotionEmoji = emotionEmojis[entry.emotion] || '😐';
+        const emotionColor = emotionColors[entry.emotion] || 'bg-gray-100 text-gray-700 border-gray-200';
+
+        const date = new Date(entry.created_at).toLocaleDateString('ko-KR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
 
         card.innerHTML = `
-          <div class="emotion-tag">감정: ${entry.emotion}</div>
-          <p>${entry.content}</p>
-          <p><strong>GPT 피드백:</strong> ${entry.feedback}</p>
-          <a href="${entry.music}" target="_blank" class="music-btn">🎵 음악 듣기</a>
-          <p>익명 유저: <strong>anon-${entry.user_id.slice(0, 4)}</strong></p>
-          <p>❤️ 좋아요: <span id="likes-${entry.id}">${entry.likes}</span>
-            <button class="like-btn" data-id="${entry.id}">+ 공감</button>
-          </p>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                ${entry.user_id.slice(0, 2).toUpperCase()}
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-800">anon-${entry.user_id.slice(0, 4)}</h4>
+                <p class="text-sm text-gray-500">${date}</p>
+              </div>
+            </div>
+            <div class="px-3 py-1 rounded-full text-xs font-medium border-2 ${emotionColor}">
+              ${emotionEmoji} ${entry.emotion}
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <p class="text-gray-700 leading-relaxed mb-3">${entry.content}</p>
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border-l-4 border-indigo-400 mb-3">
+              <p class="text-sm text-gray-700"><span class="font-semibold text-indigo-700">🤖 AI 피드백:</span> ${entry.feedback}</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center space-x-3">
+              <button class="like-btn flex items-center space-x-1 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-full transition-all duration-300 text-sm font-medium" data-id="${entry.id}">
+                <span>❤️</span>
+                <span id="likes-${entry.id}">${entry.likes || 0}</span>
+              </button>
+
+              ${entry.music ? `
+                <a href="${entry.music}" target="_blank"
+                   class="flex items-center space-x-1 px-3 py-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-full transition-all duration-300 text-sm font-medium">
+                  <span>🎵</span>
+                  <span>음악 들기</span>
+                </a>
+              ` : ''}
+            </div>
+          </div>
         `;
         diaryList.appendChild(card);
       });

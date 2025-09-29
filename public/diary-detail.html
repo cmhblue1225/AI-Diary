@@ -3,78 +3,177 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>일기 상세 보기</title>
+  <title>일기 상세 보기 - 한 숨의 위로</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'emotion-happy': '#10B981',
+            'emotion-sad': '#3B82F6',
+            'emotion-angry': '#EF4444',
+            'emotion-anxious': '#F59E0B',
+            'emotion-neutral': '#6B7280'
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'slide-up': 'slideUp 0.4s ease-out',
+            'bounce-in': 'bounceIn 0.6s ease-out'
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body {
-      font-family: 'Pretendard', sans-serif;
-      background: #f8f9fa;
-      padding: 2rem;
-      max-width: 700px;
-      margin: auto;
-      padding-bottom: 100px;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .back-btn {
-      display: inline-block;
-      margin-bottom: 1rem;
-      color: #339af0;
-      font-weight: bold;
-      text-decoration: none;
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .diary-box {
-      background: #ffffff;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.05);
-      margin-bottom: 1.5rem;
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0.3); }
+      50% { opacity: 1; transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
-    .diary-box p {
-      margin: 0.5rem 0;
-      line-height: 1.5;
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
 
-    .label {
-      font-weight: bold;
-    }
-
-    #feedback-box {
-      background: #fff3bf;
-      padding: 1rem;
-      border-radius: 10px;
-      margin-bottom: 2rem;
-    }
-
-    .chat-btn {
-      padding: 0.8rem 1.2rem;
-      font-size: 1rem;
-      background: #339af0;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      display: block;
-      margin: auto;
-      font-weight: bold;
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
     }
   </style>
 </head>
-<body>
-  <a href="my-diary.html" class="back-btn">← 내 일기 목록으로</a>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="dashboard.html" class="nav-brand">🌙 한 숨의 위로</a>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">대시보드</a>
+        </li>
+        <li class="nav-item">
+          <a href="write-diary.html" class="nav-link">일기 작성</a>
+        </li>
+        <li class="nav-item">
+          <a href="my-diary.html" class="nav-link active">내 일기</a>
+        </li>
+        <li class="nav-item">
+          <a href="anonymous-community.html" class="nav-link">익명 커뮤니티</a>
+        </li>
+        <li class="nav-item">
+          <a href="stats.html" class="nav-link">통계</a>
+        </li>
+        <li class="nav-item">
+          <a href="my-page.html" class="nav-link">마이페이지</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 
-  <h1>📘 일기 상세</h1>
+  <!-- Main Container -->
+  <div class="max-w-4xl mx-auto px-4 py-6 pt-24">
+    <!-- Back Button -->
+    <div class="mb-6 animate-fade-in">
+      <a href="my-diary.html"
+         class="inline-flex items-center space-x-2 text-indigo-600 hover:text-indigo-700 font-medium transition-all duration-300 hover:scale-105">
+        <span>←</span>
+        <span>내 일기 목록으로</span>
+      </a>
+    </div>
 
-  <div class="diary-box">
-    <p><span class="label">🕒 작성일:</span> <span id="created-at"></span></p>
-    <p><span class="label">💬 감정:</span> <span id="emotion"></span></p>
-    <p><span class="label">📝 내용:</span></p>
-    <p id="content"></p>
+    <!-- Header -->
+    <div class="text-center mb-8 animate-fade-in">
+      <div class="gradient-bg rounded-2xl p-8 text-white mb-6">
+        <h1 class="text-3xl font-bold mb-2">📘 일기 상세보기</h1>
+        <p class="text-lg opacity-90">나의 소중한 감정 기록을 되돌아보세요</p>
+      </div>
+    </div>
+
+    <!-- Diary Content -->
+    <div class="bg-white rounded-2xl p-8 shadow-lg mb-6 animate-slide-up">
+      <!-- Diary Info Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 pb-6 border-b border-gray-200">
+        <div class="flex items-center space-x-3 mb-4 sm:mb-0">
+          <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
+            📝
+          </div>
+          <div>
+            <h2 class="text-xl font-bold text-gray-800">감정 일기</h2>
+            <p class="text-gray-600">나의 마음을 담은 기록</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-sm text-gray-500 mb-1">작성일시</div>
+          <div id="created-at" class="font-semibold text-gray-800">불러오는 중...</div>
+        </div>
+      </div>
+
+      <!-- Emotion Badge -->
+      <div class="mb-6">
+        <div class="flex items-center space-x-3 mb-4">
+          <span class="text-gray-700 font-medium">💭 감정 상태:</span>
+          <div id="emotion-badge" class="px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700">
+            불러오는 중...
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center space-x-2">
+          <span>📝</span>
+          <span>일기 내용</span>
+        </h3>
+        <div id="content" class="bg-gray-50 rounded-lg p-6 text-gray-700 leading-relaxed whitespace-pre-wrap min-h-[120px] flex items-center justify-center text-gray-500">
+          일기 내용을 불러오는 중...
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Feedback -->
+    <div id="feedback-box" class="bg-white rounded-2xl p-6 shadow-lg mb-6 animate-slide-up hidden" style="animation-delay: 0.1s;">
+      <div class="flex items-center space-x-3 mb-4">
+        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white text-lg font-bold">
+          🤖
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">AI 감정 분석 및 추천</h3>
+          <p class="text-gray-600 text-sm">당신의 마음을 이해하고 위로를 전합니다</p>
+        </div>
+      </div>
+      <div id="feedback-content" class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg p-6 border-l-4 border-blue-400">
+        <!-- AI feedback will be inserted here -->
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="text-center animate-slide-up" style="animation-delay: 0.2s;">
+      <button id="chat-btn"
+              class="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+        <span class="flex items-center justify-center space-x-3">
+          <span>💬</span>
+          <span>이 일기로 AI 상담 시작하기</span>
+          <span>→</span>
+        </span>
+      </button>
+
+      <p class="mt-4 text-gray-500 text-sm">
+        AI와 함께 더 깊은 감정 대화를 나누어보세요
+      </p>
+    </div>
   </div>
-
-  <div id="feedback-box" style="display: none;"></div>
-
-  <button class="chat-btn" id="chat-btn">💬 이 일기로 AI 상담 시작</button>
 
   <script type="module">
     import { supabase } from './js/supabase.js';
@@ -94,10 +193,42 @@
 
       const utc = new Date(data.created_at);
       const kst = new Date(utc.getTime() + 9 * 60 * 60 * 1000);
-      document.getElementById('created-at').textContent = kst.toLocaleString('ko-KR');
+      document.getElementById('created-at').textContent = kst.toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
 
-      document.getElementById('emotion').textContent = data.emotion;
-      document.getElementById('content').textContent = data.content;
+      // Emotion badge with color
+      const emotionBadge = document.getElementById('emotion-badge');
+      const emotionEmojis = {
+        'happy': '😊 행복',
+        'sad': '😢 슬픔',
+        'angry': '😠 분노',
+        'anxious': '😟 불안',
+        'neutral': '😐 보통'
+      };
+
+      const emotionColors = {
+        'happy': 'bg-emerald-100 text-emerald-700 border border-emerald-200',
+        'sad': 'bg-blue-100 text-blue-700 border border-blue-200',
+        'angry': 'bg-red-100 text-red-700 border border-red-200',
+        'anxious': 'bg-amber-100 text-amber-700 border border-amber-200',
+        'neutral': 'bg-gray-100 text-gray-700 border border-gray-200'
+      };
+
+      const emotionText = emotionEmojis[data.emotion] || data.emotion;
+      const emotionColor = emotionColors[data.emotion] || 'bg-gray-100 text-gray-700 border border-gray-200';
+
+      emotionBadge.textContent = emotionText;
+      emotionBadge.className = `px-4 py-2 rounded-full text-sm font-medium ${emotionColor}`;
+
+      const contentEl = document.getElementById('content');
+      contentEl.textContent = data.content;
+      contentEl.className = 'bg-gray-50 rounded-lg p-6 text-gray-700 leading-relaxed whitespace-pre-wrap min-h-[120px]';
 
       const res = await fetch('https://emotion-gpt-api.onrender.com/api/feedback', {
         method: 'POST',
@@ -107,10 +238,31 @@
 
       const gpt = await res.json();
       if (gpt.feedback || gpt.music) {
-        feedbackBox.style.display = 'block';
-        feedbackBox.innerHTML = `
-          <p><strong>GPT 피드백:</strong> ${gpt.feedback}</p>
-          <p><a href="${gpt.music}" target="_blank">🎵 음악 추천 듣기</a></p>
+        feedbackBox.classList.remove('hidden');
+        document.getElementById('feedback-content').innerHTML = `
+          <div class="space-y-4">
+            <div>
+              <h4 class="font-semibold text-gray-800 mb-2 flex items-center space-x-2">
+                <span>💭</span>
+                <span>AI 감정 분석</span>
+              </h4>
+              <p class="text-gray-700 leading-relaxed">${gpt.feedback}</p>
+            </div>
+            ${gpt.music ? `
+              <div class="pt-4 border-t border-blue-200">
+                <h4 class="font-semibold text-gray-800 mb-3 flex items-center space-x-2">
+                  <span>🎵</span>
+                  <span>추천 음악</span>
+                </h4>
+                <a href="${gpt.music}" target="_blank"
+                   class="inline-flex items-center space-x-2 px-4 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                  <span>▶️</span>
+                  <span>음악 들으러 가기</span>
+                  <span>→</span>
+                </a>
+              </div>
+            ` : ''}
+          </div>
         `;
       }
     }
@@ -121,42 +273,5 @@
 
     loadDiary();
   </script>
-<script>
-
-// 일기 상세 페이지 로딩 시 GPT 피드백 표시
-window.addEventListener('DOMContentLoaded', () => {
-  const feedbackText = document.getElementById('gptFeedbackContent')?.innerText;
-
-  if (feedbackText) {
-    const feedbackContainer = document.getElementById('gptFeedbackContainer');
-    const parsed = parseFeedback(feedbackText);
-
-    feedbackContainer.innerHTML = `
-      <div class="music-recommendation-card">
-        <h3>🎵 추천곡: ${parsed.song}</h3>
-        <p>🎤 가수: ${parsed.artist}</p>
-        <p>📝 추천 이유: ${parsed.reason}</p>
-        <a href="${parsed.youtube}" target="_blank" class="listen-button">▶️ 유튜브에서 듣기</a>
-      </div>
-    `;
-  }
-});
-
-// GPT 응답 텍스트 파싱 함수 (write-diary.html과 동일)
-function parseFeedback(text) {
-  const songMatch = text.match(/🎵 추천곡 제목:\s*(.*)/);
-  const artistMatch = text.match(/🎤 가수:\s*(.*)/);
-  const reasonMatch = text.match(/📝 추천 이유:\s*(.*)/);
-  const youtubeMatch = text.match(/▶️ 유튜브 링크:\s*(.*)/);
-
-  return {
-    song: songMatch ? songMatch[1].trim() : '제목 없음',
-    artist: artistMatch ? artistMatch[1].trim() : '가수 없음',
-    reason: reasonMatch ? reasonMatch[1].trim() : '추천 이유 없음',
-    youtube: youtubeMatch ? youtubeMatch[1].trim() : '#',
-  };
-}
-
-</script>
 </body>
 </html>

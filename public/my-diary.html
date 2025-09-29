@@ -5,120 +5,85 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>내 감정 일기</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'emotion-happy': '#10B981',
+            'emotion-sad': '#3B82F6',
+            'emotion-angry': '#EF4444',
+            'emotion-anxious': '#F59E0B',
+            'emotion-neutral': '#6B7280'
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'slide-up': 'slideUp 0.4s ease-out',
+            'bounce-in': 'bounceIn 0.6s ease-out'
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body {
-      font-family: 'Gowun Dodum', sans-serif;
-      background: linear-gradient(to bottom, #e3f2fd, #f8f9fa);
-      padding: 2rem 1.2rem;
-      padding-top: 90px;
-      max-width: 700px;
-      margin: auto;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      color: #228be6;
-    }
-
-    .action-bar,
-    .filter-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-      gap: 1rem;
-    }
-
-    .action-bar button {
-      background-color: #228be6;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 0.6rem 1rem;
-      font-size: 0.95rem;
-      cursor: pointer;
-    }
-
-    .date-filter-container {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .date-filter-container input[type="date"] {
-      padding: 0.5rem 0.6rem;
-      font-size: 0.95rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    .filter-bar label {
-      font-weight: bold;
-      font-size: 1rem;
-    }
-
-    .filter-bar select {
-      padding: 0.5rem 0.6rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    .diary-card {
-      background-color: white;
-      border-left: 6px solid #228be6;
-      padding: 1rem;
-      border-radius: 10px;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      animation: fadeIn 0.5s ease;
-    }
-
-    .diary-card h3 {
-      margin: 0 0 0.5rem 0;
-      font-size: 1.2rem;
-    }
-
-    .diary-card .date {
-      font-size: 0.9rem;
-      color: #888;
-      margin-top: 0.5rem;
-    }
-
-    .diary-card button {
-      margin-top: 0.7rem;
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-      background-color: #339af0;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .color-happy { border-left-color: #ffd43b; background-color: #fffbea; }
-    .color-sad { border-left-color: #74c0fc; background-color: #e7f5ff; }
-    .color-angry { border-left-color: #fa5252; background-color: #fff5f5; }
-    .color-anxious { border-left-color: #868e96; background-color: #f1f3f5; }
-    .color-neutral { border-left-color: #ced4da; background-color: #f8f9fa; }
-
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0.3); }
+      50% { opacity: 1; transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .emotion-card {
+      transition: all 0.3s ease;
+    }
+
+    .emotion-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .emotion-happy {
+      background: linear-gradient(135deg, #d4fdd4 0%, #c6f6d5 100%);
+      border-left: 4px solid #10B981;
+    }
+
+    .emotion-sad {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      border-left: 4px solid #3B82F6;
+    }
+
+    .emotion-angry {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      border-left: 4px solid #EF4444;
+    }
+
+    .emotion-anxious {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border-left: 4px solid #F59E0B;
+    }
+
+    .emotion-neutral {
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      border-left: 4px solid #6B7280;
     }
   </style>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen">
   <nav class="navbar">
     <div class="nav-container">
       <a href="dashboard.html" class="nav-brand">🌙 한 숨의 위로</a>
@@ -145,31 +110,62 @@
     </div>
   </nav>
 
-  <header>
-    <h1>📘 내 감정 일기</h1>
-  </header>
+  <!-- Main Container -->
+  <div class="max-w-4xl mx-auto px-4 py-6 pt-24">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="gradient-bg rounded-3xl p-8 text-white mb-6 animate-fade-in">
+        <h1 class="text-4xl font-bold mb-3">📘 내 감정 일기</h1>
+        <p class="text-lg opacity-90">나만의 소중한 감정 여행을 되돌아보세요</p>
+        <div class="mt-4 text-sm opacity-80">
+          📝 개인 기록 보관소 · 🎭 감정별 필터링 · 📅 날짜별 검색
+        </div>
+      </div>
+    </div>
 
-  <div class="action-bar">
-    <button onclick="location.href='write-diary.html'">+ 일기 작성하기</button>
-    <div class="date-filter-container">
-      <i class="fa-solid fa-calendar-days" style="color: #228be6;"></i>
-      <input type="date" id="date-filter" />
+    <!-- Control Bar -->
+    <div class="bg-white rounded-2xl p-6 shadow-lg mb-8 animate-slide-up">
+      <div class="flex flex-col lg:flex-row gap-4 items-center justify-between">
+        <!-- New Diary Button -->
+        <button onclick="location.href='write-diary.html'"
+                class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+          ✍️ 새 일기 작성하기
+        </button>
+
+        <!-- Filters -->
+        <div class="flex flex-col sm:flex-row gap-4">
+          <!-- Date Filter -->
+          <div class="flex items-center space-x-2">
+            <div class="text-indigo-600 text-lg">📅</div>
+            <input type="date" id="date-filter"
+                   class="px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-300">
+          </div>
+
+          <!-- Emotion Filter -->
+          <div class="flex items-center space-x-2">
+            <label for="emotion-filter" class="text-gray-700 font-medium whitespace-nowrap">🎭 감정</label>
+            <select id="emotion-filter"
+                    class="px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-300">
+              <option value="all">전체</option>
+              <option value="happy">😊 행복</option>
+              <option value="sad">😢 슬픔</option>
+              <option value="angry">😠 분노</option>
+              <option value="anxious">😟 불안</option>
+              <option value="neutral">😐 보통</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diary List -->
+    <div id="diary-list" class="space-y-4">
+      <div class="text-center py-12">
+        <div class="animate-spin w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <p class="text-gray-500">일기를 불러오는 중...</p>
+      </div>
     </div>
   </div>
-
-  <div class="filter-bar">
-    <label for="emotion-filter">감정 필터</label>
-    <select id="emotion-filter">
-      <option value="all">전체</option>
-      <option value="happy">😊 행복</option>
-      <option value="sad">😢 슬픔</option>
-      <option value="angry">😠 분노</option>
-      <option value="anxious">😟 불안</option>
-      <option value="neutral">😐 보통</option>
-    </select>
-  </div>
-
-  <div id="diary-list"></div>
 
   <script type="module">
     import { supabase } from './js/supabase.js';
@@ -229,22 +225,64 @@
       diaryList.innerHTML = '';
 
       if (filtered.length === 0) {
-        diaryList.innerHTML = '<p>일기가 없습니다.</p>';
+        diaryList.innerHTML = `
+          <div class="text-center py-16">
+            <div class="text-6xl mb-6">📝</div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-3">아직 작성한 일기가 없습니다</h3>
+            <p class="text-gray-600 mb-6">첫 번째 감정 일기를 작성해보세요!</p>
+            <button onclick="location.href='write-diary.html'"
+                    class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              ✍️ 일기 쓰러 가기
+            </button>
+          </div>
+        `;
         return;
       }
 
-      filtered.forEach(diary => {
+      filtered.forEach((diary, index) => {
         const card = document.createElement('div');
-        card.className = `diary-card ${colorClassMap[diary.emotion] || ''}`;
+        card.className = `emotion-card rounded-2xl p-6 shadow-lg animate-slide-up emotion-${diary.emotion}`;
+        card.style.animationDelay = `${index * 0.1}s`;
 
         const emotionText = emotionMap[diary.emotion] || diary.emotion;
-        const date = new Date(diary.created_at).toLocaleDateString();
+        const date = new Date(diary.created_at).toLocaleDateString('ko-KR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          weekday: 'long'
+        });
+
+        const previewText = diary.content.length > 150
+          ? diary.content.substring(0, 150) + '...'
+          : diary.content;
 
         card.innerHTML = `
-          <h3>${emotionText}</h3>
-          <p>${diary.content}</p>
-          <p class="date">${date}</p>
-          <button onclick="location.href='diary-detail.html?id=${diary.id}'">상세 보기</button>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="text-2xl">${emotionText.split(' ')[0]}</span>
+              <div>
+                <h3 class="font-bold text-lg text-gray-800">${emotionText}</h3>
+                <p class="text-sm text-gray-500">${date}</p>
+              </div>
+            </div>
+            <div class="text-xs bg-white bg-opacity-60 px-3 py-1 rounded-full">
+              ${diary.emotion}
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <p class="text-gray-700 leading-relaxed">${previewText}</p>
+          </div>
+
+          <div class="flex justify-between items-center">
+            <div class="text-xs text-gray-500">
+              ${diary.content.length}자
+            </div>
+            <button onclick="location.href='diary-detail.html?id=${diary.id}'"
+                    class="px-4 py-2 bg-white bg-opacity-80 hover:bg-opacity-100 text-gray-700 font-medium rounded-lg transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md">
+              상세 보기 →
+            </button>
+          </div>
         `;
 
         diaryList.appendChild(card);

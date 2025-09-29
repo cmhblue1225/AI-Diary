@@ -5,99 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AI 감정 분석 대시보드</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'emotion-happy': '#10B981',
+            'emotion-sad': '#3B82F6',
+            'emotion-angry': '#EF4444',
+            'emotion-anxious': '#F59E0B',
+            'emotion-neutral': '#6B7280'
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'slide-up': 'slideUp 0.4s ease-out',
+            'bounce-in': 'bounceIn 0.6s ease-out',
+            'counter': 'counter 2s ease-out'
+          }
+        }
+      }
+    }
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: 'Gowun Dodum', sans-serif;
-      padding: 1rem 1rem;
-      padding-top: 90px;
-      max-width: 1200px;
-      margin: auto;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounceIn {
+      0% { opacity: 0; transform: scale(0.3); }
+      50% { opacity: 1; transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes counter {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .gradient-bg {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
     }
 
-    .dashboard-header {
-      text-align: center;
-      margin-bottom: 2rem;
-      color: white;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    .stats-card {
+      transition: all 0.3s ease;
     }
 
-    .dashboard-header h1 {
+    .stats-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+
+    .metric-number {
       font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-      background: linear-gradient(45deg, #ff6b9d, #74c0fc);
+      font-weight: bold;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-
-    .dashboard-header p {
-      font-size: 1.1rem;
-      opacity: 0.9;
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .dashboard-card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
-      padding: 1.5rem;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.2);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .dashboard-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid #f1f3f5;
-    }
-
-    .card-header h3 {
-      margin: 0;
-      color: #343a40;
-      font-size: 1.3rem;
-    }
-
-    .ai-insights-card {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border: none;
-    }
-
-    .ai-insights-header {
-      display: flex;
-      justify-content: between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .ai-badge {
-      background: rgba(255,255,255,0.2);
-      padding: 0.3rem 0.8rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: bold;
-    }
-
-    .ai-insights-content {
       font-size: 1.1rem;
       line-height: 1.6;
       margin-bottom: 1.5rem;
@@ -407,7 +387,7 @@
     }
   </style>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen">
   <nav class="navbar">
     <div class="nav-container">
       <a href="dashboard.html" class="nav-brand">🌙 한 숨의 위로</a>
@@ -434,9 +414,18 @@
     </div>
   </nav>
 
-  <div class="dashboard-header">
-    <h1>🧠 AI 감정 분석 대시보드</h1>
-    <p>GPT-4o가 분석하는 당신의 감정 여정</p>
+  <!-- Main Container -->
+  <div class="max-w-7xl mx-auto px-4 py-6 pt-24">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="gradient-bg rounded-3xl p-8 text-white mb-6 animate-fade-in">
+        <h1 class="text-4xl font-bold mb-3">🧠 AI 감정 분석 대시보드</h1>
+        <p class="text-lg opacity-90">GPT-4o가 분석하는 당신의 감정 여정</p>
+        <div class="mt-4 text-sm opacity-80">
+          📊 실시간 분석 · 🎯 패턴 인식 · 💡 개인화 인사이트
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="no-data" style="display: none;">
