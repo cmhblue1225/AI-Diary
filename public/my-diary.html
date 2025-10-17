@@ -294,8 +294,9 @@
         console.log(`📝 카드 ${index + 1}/${filtered.length} 생성 중:`, diary.id);
 
         const card = document.createElement('div');
-        card.className = `emotion-card rounded-2xl p-6 shadow-lg animate-slide-up emotion-${diary.emotion}`;
-        card.style.animationDelay = `${index * 0.1}s`;
+        card.className = `emotion-card rounded-2xl p-6 shadow-lg emotion-${diary.emotion}`;
+        // 애니메이션 제거 - 즉시 표시
+        card.style.opacity = '1';
 
         const emotionText = emotionMap[diary.emotion] || diary.emotion;
         const date = new Date(diary.created_at).toLocaleDateString('ko-KR', {
