@@ -27,7 +27,13 @@
       }
     }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- 애니메이션 라이브러리 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <!-- 카운터 애니메이션 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.8.0/countUp.umd.min.js"></script>
+  <!-- 파티클 효과 -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <style>
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
@@ -477,6 +483,10 @@
         padding: 1.5rem;
       }
 
+      .dashboard-card[style*="grid-column: 1 / -1"] {
+        grid-column: 1;
+      }
+
       .ai-insights-actions {
         flex-direction: column;
       }
@@ -501,12 +511,32 @@
         font-size: 1.25rem;
       }
 
-      .metric-number {
+      .metric-number, .counter-number {
         font-size: 2rem;
       }
 
       canvas {
         padding: 0.5rem;
+      }
+
+      .timeline-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+      }
+
+      .cloud-item {
+        margin: 0.3rem;
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      .calendar-heatmap {
+        gap: 2px;
+      }
+
+      #particles-js {
+        display: none; /* 모바일에서 성능을 위해 파티클 숨김 */
       }
     }
 
@@ -523,10 +553,372 @@
       .emotion-badge {
         padding: 0.6rem 1rem;
       }
+
+      .counter-number {
+        font-size: 1.8rem;
+      }
+
+      .streak-card::before {
+        font-size: 6rem;
+        right: -1rem;
+        top: -1rem;
+      }
+    }
+
+    /* 새로운 화려한 스타일 추가 */
+
+    /* 파티클 배경 */
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    /* 스태거 애니메이션 */
+    .stagger-item {
+      opacity: 0;
+      animation: staggerFadeIn 0.6s ease-out forwards;
+    }
+
+    @keyframes staggerFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* 글로우 효과 */
+    .glow-card {
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1),
+                  0 0 20px rgba(102, 126, 234, 0.3);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glow-card:hover {
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2),
+                  0 0 40px rgba(102, 126, 234, 0.6);
+      transform: translateY(-8px) scale(1.02);
+    }
+
+    /* 펄스 애니메이션 - 차트에서 제거 */
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    .pulse-on-hover:hover {
+      /* 차트 카드는 펄스 애니메이션 비활성화 */
+      animation: none;
+    }
+
+    /* 숫자 카운터 스타일 */
+    .counter-number {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+
+    .counter-number:hover {
+      transform: scale(1.1);
+    }
+
+    /* 새로운 카드 타입: 스트릭 카드 */
+    .streak-card {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .streak-card::before {
+      content: '🔥';
+      font-size: 10rem;
+      position: absolute;
+      right: -2rem;
+      top: -2rem;
+      opacity: 0.15;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    /* 감정 다양성 게이지 */
+    .diversity-gauge {
+      width: 100%;
+      height: 20px;
+      background: linear-gradient(90deg,
+        #ff6b6b 0%,
+        #feca57 25%,
+        #48dbfb 50%,
+        #1dd1a1 75%,
+        #ee5a6f 100%);
+      border-radius: 50px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .diversity-gauge::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* 월간 캘린더 히트맵 */
+    .calendar-heatmap {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-top: 1rem;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      border-radius: 4px;
+      background: #e9ecef;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .calendar-day:hover {
+      transform: scale(1.2);
+      z-index: 10;
+    }
+
+    .calendar-day[data-intensity="1"] { background: #c3fae8; }
+    .calendar-day[data-intensity="2"] { background: #96f2d7; }
+    .calendar-day[data-intensity="3"] { background: #63e6be; }
+    .calendar-day[data-intensity="4"] { background: #38d9a9; }
+    .calendar-day[data-intensity="5"] { background: #20c997; }
+
+    /* 감정 레이더 차트 컨테이너 */
+    .radar-chart-container {
+      position: relative;
+      height: 400px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    /* 감정 흐름 타임라인 */
+    .emotion-timeline {
+      position: relative;
+      padding: 2rem 0;
+    }
+
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+      position: relative;
+      opacity: 0;
+      animation: slideInRight 0.6s ease-out forwards;
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .timeline-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      background: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin-right: 1.5rem;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+
+    .timeline-item:hover .timeline-icon {
+      transform: scale(1.2) rotate(360deg);
+    }
+
+    .timeline-content {
+      flex: 1;
+      background: rgba(255,255,255,0.9);
+      padding: 1.5rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    /* 3D 감정 구름 효과 */
+    .emotion-cloud {
+      perspective: 1000px;
+      margin: 2rem 0;
+    }
+
+    .cloud-item {
+      display: inline-block;
+      margin: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 25px;
+      font-weight: bold;
+      transform: rotateX(0deg) rotateY(0deg);
+      transition: all 0.4s ease;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .cloud-item:hover {
+      transform: rotateX(10deg) rotateY(10deg) scale(1.15);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    /* 로딩 스켈레톤 */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 10px;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* 인터랙티브 버튼 */
+    .interactive-btn {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .interactive-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .interactive-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .interactive-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+    }
+
+    /* 감정 강도 게이지 */
+    .intensity-gauge {
+      width: 100%;
+      height: 30px;
+      background: #f1f3f5;
+      border-radius: 50px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .gauge-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #51cf66, #ffd43b, #ff6b6b);
+      border-radius: 50px;
+      transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gauge-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    /* 모프 트랜지션 */
+    .morph-card {
+      transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .morph-card.expanded {
+      transform: scale(1.05);
+      z-index: 100;
+    }
+
+    /* 그라데이션 텍스트 */
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+      background-size: 200% auto;
+      animation: gradientShift 3s linear infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
     }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+  <!-- 파티클 배경 -->
+  <div id="particles-js"></div>
+
   <nav class="navbar">
     <div class="nav-container">
       <a href="dashboard.html" class="nav-brand">🌙 한 숨의 위로</a>
@@ -557,11 +949,15 @@
   <div class="max-w-7xl mx-auto px-4 py-6 pt-24">
     <!-- Header -->
     <div class="text-center mb-8">
-      <div class="gradient-bg rounded-3xl p-8 text-white mb-6 animate-fade-in">
-        <h1 class="text-4xl font-bold mb-3">🧠 AI 감정 분석 대시보드</h1>
-        <p class="text-lg opacity-90">GPT-4o가 분석하는 당신의 감정 여정</p>
-        <div class="mt-4 text-sm opacity-80">
-          📊 실시간 분석 · 🎯 패턴 인식 · 💡 개인화 인사이트
+      <div class="gradient-bg rounded-3xl p-8 text-white mb-6 animate-fade-in glow-card">
+        <h1 class="text-5xl font-bold mb-3 gradient-text" style="-webkit-text-fill-color: white;">
+          🧠 AI 감정 분석 대시보드
+        </h1>
+        <p class="text-xl opacity-90">GPT-4o가 분석하는 당신의 감정 여정</p>
+        <div class="mt-6 text-base opacity-90 flex justify-center gap-4 flex-wrap">
+          <span class="px-4 py-2 bg-white/20 rounded-full backdrop-blur-md">📊 실시간 분석</span>
+          <span class="px-4 py-2 bg-white/20 rounded-full backdrop-blur-md">🎯 패턴 인식</span>
+          <span class="px-4 py-2 bg-white/20 rounded-full backdrop-blur-md">💡 개인화 인사이트</span>
         </div>
       </div>
     </div>
@@ -575,8 +971,36 @@
 
     <!-- Dashboard Grid -->
     <div class="dashboard-grid" id="main-dashboard" style="display: none;">
+
+    <!-- 스트릭 카드 (연속 작성 기록) -->
+    <div class="dashboard-card streak-card stagger-item glow-card" style="animation-delay: 0.1s;">
+      <div class="profile-header">
+        <h3>🔥 연속 작성 스트릭</h3>
+      </div>
+      <div class="text-center mt-4">
+        <div class="counter-number" id="streak-counter" style="color: white;">0</div>
+        <p class="text-white/90 mt-2">일 연속 작성 중!</p>
+        <div class="mt-4 text-white/80">
+          <p id="streak-message">계속해서 일기를 작성하고 있어요! 👏</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 감정 다양성 점수 카드 -->
+    <div class="dashboard-card stagger-item glow-card" style="animation-delay: 0.2s; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+      <div class="card-header">
+        <h3 style="color: #495057;">🎨 감정 다양성 점수</h3>
+      </div>
+      <div class="text-center mt-4">
+        <div class="counter-number" id="diversity-counter">0</div>
+        <p class="text-gray-600 mt-2">가지의 감정을 경험했어요</p>
+        <div class="diversity-gauge mt-4"></div>
+        <p class="text-sm text-gray-500 mt-2" id="diversity-message">다양한 감정을 느끼는 것은 건강한 신호입니다</p>
+      </div>
+    </div>
+
     <!-- AI 인사이트 카드 -->
-    <div class="dashboard-card ai-insights-card">
+    <div class="dashboard-card ai-insights-card stagger-item glow-card" style="animation-delay: 0.3s;">
       <div id="ai-insights-container">
         <div class="ai-insights-header">
           <h3>🧠 AI 감정 인사이트</h3>
@@ -589,7 +1013,7 @@
     </div>
 
     <!-- 감정 프로필 카드 -->
-    <div class="dashboard-card emotion-profile-card">
+    <div class="dashboard-card emotion-profile-card stagger-item glow-card" style="animation-delay: 0.4s;">
       <div id="emotion-profile-container">
         <div class="profile-header">
           <h3>📊 나의 감정 프로필</h3>
@@ -599,8 +1023,23 @@
       </div>
     </div>
 
+    <!-- 월간 감정 캘린더 -->
+    <div class="dashboard-card stagger-item glow-card morph-card" style="animation-delay: 0.5s;">
+      <div class="card-header">
+        <h3>📅 월간 감정 캘린더</h3>
+      </div>
+      <div id="calendar-heatmap-container">
+        <div class="text-sm text-gray-600 mb-2">최근 28일간의 감정 기록</div>
+        <div class="calendar-heatmap" id="emotion-calendar"></div>
+        <div class="flex justify-between mt-4 text-xs text-gray-500">
+          <span>😔 낮음</span>
+          <span>😊 높음</span>
+        </div>
+      </div>
+    </div>
+
     <!-- 감정 변화 트렌드 -->
-    <div class="dashboard-card">
+    <div class="dashboard-card stagger-item glow-card" style="animation-delay: 0.6s;">
       <div class="card-header">
         <h3>📈 감정 변화 추세</h3>
       </div>
@@ -608,15 +1047,43 @@
     </div>
 
     <!-- 상세 분석 차트 -->
-    <div class="dashboard-card">
+    <div class="dashboard-card stagger-item glow-card" style="animation-delay: 0.7s;">
       <div class="card-header">
         <h3>🎯 감정 분포 분석</h3>
       </div>
       <canvas id="emotion-pie-chart"></canvas>
     </div>
 
+    <!-- 감정 강도 게이지 -->
+    <div class="dashboard-card stagger-item glow-card" style="animation-delay: 0.8s; background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);">
+      <div class="card-header">
+        <h3 style="color: #2d3436;">⚡ 현재 감정 강도</h3>
+      </div>
+      <div class="mt-4">
+        <div class="intensity-gauge">
+          <div class="gauge-fill" id="intensity-gauge-fill" style="width: 0%;"></div>
+        </div>
+        <div class="flex justify-between mt-3 text-sm text-gray-700">
+          <span>😌 평온</span>
+          <span>😐 보통</span>
+          <span>😤 강렬</span>
+        </div>
+        <p class="text-center mt-4 text-gray-700 font-semibold" id="intensity-text">감정 강도 분석 중...</p>
+      </div>
+    </div>
+
+    <!-- 감정 흐름 타임라인 -->
+    <div class="dashboard-card stagger-item glow-card" style="animation-delay: 0.9s; grid-column: 1 / -1;">
+      <div class="card-header">
+        <h3>🌊 감정 흐름 타임라인</h3>
+      </div>
+      <div class="emotion-timeline" id="emotion-timeline">
+        <!-- 타임라인 아이템이 동적으로 추가됩니다 -->
+      </div>
+    </div>
+
     <!-- 시간대별 감정 패턴 -->
-    <div class="dashboard-card">
+    <div class="dashboard-card stagger-item glow-card" style="animation-delay: 1.0s;">
       <div class="card-header">
         <h3>⏰ 시간대별 감정 패턴</h3>
       </div>
@@ -624,11 +1091,21 @@
     </div>
 
     <!-- 요일별 감정 분석 -->
-    <div class="dashboard-card">
+    <div class="dashboard-card stagger-item glow-card" style="animation-delay: 1.1s;">
       <div class="card-header">
         <h3>📅 요일별 감정 분석</h3>
       </div>
       <canvas id="weekly-pattern-chart"></canvas>
+    </div>
+
+    <!-- 3D 감정 구름 -->
+    <div class="dashboard-card stagger-item glow-card" style="animation-delay: 1.2s; grid-column: 1 / -1;">
+      <div class="card-header">
+        <h3>☁️ 감정 키워드 클라우드</h3>
+      </div>
+      <div class="emotion-cloud" id="emotion-cloud">
+        <!-- 감정 키워드가 동적으로 추가됩니다 -->
+      </div>
     </div>
     </div>
     <!-- End of Dashboard Grid -->
@@ -644,6 +1121,174 @@
 
     // AI 대시보드 전역 접근을 위한 설정
     window.aiDashboard = aiDashboard;
+
+    // 파티클 효과 초기화
+    if (typeof particlesJS !== 'undefined') {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#ffffff' },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5, random: true },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#ffffff',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: true,
+            out_mode: 'out'
+          }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' }
+          }
+        }
+      });
+    }
+
+    // CountUp.js 카운터 애니메이션 함수
+    function animateCounter(elementId, endValue, suffix = '') {
+      if (typeof countUp !== 'undefined' && countUp.CountUp) {
+        const counter = new countUp.CountUp(elementId, endValue, {
+          duration: 2,
+          useEasing: true,
+          useGrouping: true,
+          suffix: suffix
+        });
+        counter.start();
+      } else {
+        // CountUp.js가 로드되지 않은 경우 기본 표시
+        document.getElementById(elementId).textContent = endValue + suffix;
+      }
+    }
+
+    // 연속 작성 스트릭 계산
+    function calculateStreak(diaryDates) {
+      if (!diaryDates || diaryDates.length === 0) return 0;
+
+      const dates = diaryDates.map(d => new Date(d).toDateString()).sort();
+      let streak = 1;
+      let currentStreak = 1;
+
+      for (let i = 1; i < dates.length; i++) {
+        const prevDate = new Date(dates[i - 1]);
+        const currDate = new Date(dates[i]);
+        const diffDays = Math.floor((currDate - prevDate) / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) {
+          currentStreak++;
+          streak = Math.max(streak, currentStreak);
+        } else if (diffDays > 1) {
+          currentStreak = 1;
+        }
+      }
+
+      return streak;
+    }
+
+    // 월간 캘린더 히트맵 생성
+    function generateCalendarHeatmap(diaryData) {
+      const calendar = document.getElementById('emotion-calendar');
+      if (!calendar) return;
+
+      calendar.innerHTML = '';
+
+      // 최근 28일 생성 (4주)
+      const today = new Date();
+      for (let i = 27; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+
+        const dayData = diaryData.filter(d => d.created_at.split('T')[0] === dateStr);
+        const intensity = dayData.length === 0 ? 0 : Math.min(Math.ceil(dayData.length / 2) + 1, 5);
+
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'calendar-day';
+        if (intensity > 0) {
+          dayDiv.setAttribute('data-intensity', intensity);
+          dayDiv.title = `${date.toLocaleDateString('ko-KR')}: ${dayData.length}개의 일기`;
+        } else {
+          dayDiv.title = `${date.toLocaleDateString('ko-KR')}: 일기 없음`;
+        }
+
+        calendar.appendChild(dayDiv);
+      }
+    }
+
+    // 감정 타임라인 생성
+    function generateEmotionTimeline(recentData) {
+      const timeline = document.getElementById('emotion-timeline');
+      if (!timeline) return;
+
+      timeline.innerHTML = '';
+
+      // 최근 5개 일기만 표시
+      recentData.slice(0, 5).forEach((entry, index) => {
+        const timelineItem = document.createElement('div');
+        timelineItem.className = 'timeline-item';
+        timelineItem.style.animationDelay = `${index * 0.1}s`;
+
+        const date = new Date(entry.created_at);
+        const icon = getEmotionIcon(entry.emotion);
+
+        timelineItem.innerHTML = `
+          <div class="timeline-icon" style="background: ${getEmotionColor(entry.emotion)};">
+            ${icon}
+          </div>
+          <div class="timeline-content">
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-semibold text-gray-800">${getEmotionLabel(entry.emotion)}</span>
+              <span class="text-sm text-gray-500">${date.toLocaleDateString('ko-KR')}</span>
+            </div>
+            <p class="text-gray-600 text-sm">기분 점수: ${Math.round(entry.mood_score || 0)}</p>
+          </div>
+        `;
+
+        timeline.appendChild(timelineItem);
+      });
+    }
+
+    // 감정 키워드 클라우드 생성
+    function generateEmotionCloud(allKeywords) {
+      const cloud = document.getElementById('emotion-cloud');
+      if (!cloud) return;
+
+      cloud.innerHTML = '';
+
+      // 키워드 빈도수 계산
+      const keywordFreq = {};
+      allKeywords.flat().forEach(keyword => {
+        if (keyword) {
+          keywordFreq[keyword] = (keywordFreq[keyword] || 0) + 1;
+        }
+      });
+
+      // 상위 15개 키워드만 표시
+      const topKeywords = Object.entries(keywordFreq)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 15);
+
+      topKeywords.forEach(([keyword, count]) => {
+        const cloudItem = document.createElement('span');
+        cloudItem.className = 'cloud-item';
+        cloudItem.textContent = keyword;
+        cloudItem.style.fontSize = `${Math.min(12 + count * 2, 24)}px`;
+        cloudItem.title = `${count}번 등장`;
+
+        cloud.appendChild(cloudItem);
+      });
+    }
 
     // 확장된 감정 점수 매핑 (24가지 감정)
     const emotionScores = {
@@ -702,6 +1347,62 @@
 
         // 감정 통계 계산
         const emotionStats = calculateEmotionStats(data);
+
+        // 새로운 통계 계산 및 표시
+        const streak = calculateStreak(data.map(d => d.created_at));
+        const uniqueEmotions = new Set(data.map(d => d.emotion)).size;
+        const avgIntensity = emotionStats.averageMood;
+
+        // 카운터 애니메이션
+        animateCounter('streak-counter', streak);
+        animateCounter('diversity-counter', uniqueEmotions);
+
+        // 스트릭 메시지 설정
+        const streakMessage = document.getElementById('streak-message');
+        if (streak >= 7) {
+          streakMessage.textContent = `대단해요! ${streak}일 연속 작성 기록입니다! 🎉`;
+        } else if (streak >= 3) {
+          streakMessage.textContent = `잘하고 있어요! ${streak}일째 일기를 쓰고 있어요! 💪`;
+        } else {
+          streakMessage.textContent = '꾸준히 일기를 작성해보세요! 📝';
+        }
+
+        // 감정 다양성 메시지
+        const diversityMessage = document.getElementById('diversity-message');
+        if (uniqueEmotions >= 10) {
+          diversityMessage.textContent = '매우 풍부한 감정 경험을 하고 있어요! 🌈';
+        } else if (uniqueEmotions >= 5) {
+          diversityMessage.textContent = '다양한 감정을 경험하고 있어요 😊';
+        } else {
+          diversityMessage.textContent = '더 많은 감정을 경험해보세요';
+        }
+
+        // 감정 강도 게이지 애니메이션
+        const intensityPercent = Math.min(((avgIntensity + 100) / 200) * 100, 100);
+        setTimeout(() => {
+          document.getElementById('intensity-gauge-fill').style.width = `${intensityPercent}%`;
+        }, 500);
+
+        const intensityText = document.getElementById('intensity-text');
+        if (avgIntensity > 50) {
+          intensityText.textContent = '😊 매우 긍정적인 감정 상태';
+        } else if (avgIntensity > 0) {
+          intensityText.textContent = '🙂 보통의 감정 상태';
+        } else if (avgIntensity > -50) {
+          intensityText.textContent = '😔 약간 우울한 감정 상태';
+        } else {
+          intensityText.textContent = '😢 도움이 필요한 상태일 수 있어요';
+        }
+
+        // 월간 캘린더 히트맵 생성
+        generateCalendarHeatmap(data);
+
+        // 감정 타임라인 생성
+        generateEmotionTimeline(data);
+
+        // 감정 키워드 클라우드 생성
+        const allKeywords = data.map(d => d.keywords || []).filter(k => k.length > 0);
+        generateEmotionCloud(allKeywords);
 
         // AI 인사이트 생성
         await generateAIInsights(data.slice(0, 10)); // 최근 10개 일기 분석
@@ -1119,8 +1820,18 @@
 
         return hourData.length > 0
           ? hourData.reduce((sum, entry) => sum + (entry.mood_score || 0), 0) / hourData.length
-          : 0;
+          : null;
       });
+
+      // 실제 데이터가 있는 경우의 최소/최대값 찾기
+      const validData = hourlyData.filter(d => d !== null);
+      const hasData = validData.length > 0;
+      const minValue = hasData ? Math.min(...validData) : -10;
+      const maxValue = hasData ? Math.max(...validData) : 10;
+
+      // y축 범위 설정 (-10 ~ +10 또는 데이터 범위에 맞춤)
+      const yMin = Math.min(minValue - 5, -10);
+      const yMax = Math.max(maxValue + 5, 10);
 
       new Chart(ctx, {
         type: 'bar',
@@ -1131,13 +1842,22 @@
             data: hourlyData,
             backgroundColor: hours.map((_, i) => {
               const value = hourlyData[i];
-              if (value > 30) return 'rgba(116, 192, 252, 0.8)';
-              if (value > 0) return 'rgba(116, 192, 252, 0.5)';
-              if (value > -30) return 'rgba(255, 135, 135, 0.5)';
+              if (value === null) return 'rgba(200, 200, 200, 0.3)';
+              if (value > 5) return 'rgba(81, 207, 102, 0.8)';
+              if (value > 0) return 'rgba(116, 192, 252, 0.8)';
+              if (value > -5) return 'rgba(255, 212, 59, 0.8)';
               return 'rgba(255, 135, 135, 0.8)';
             }),
-            borderColor: '#74c0fc',
-            borderWidth: 1
+            borderColor: hours.map((_, i) => {
+              const value = hourlyData[i];
+              if (value === null) return 'rgba(200, 200, 200, 0.5)';
+              if (value > 5) return 'rgba(81, 207, 102, 1)';
+              if (value > 0) return 'rgba(116, 192, 252, 1)';
+              if (value > -5) return 'rgba(255, 212, 59, 1)';
+              return 'rgba(255, 135, 135, 1)';
+            }),
+            borderWidth: 2,
+            borderRadius: 6
           }]
         },
         options: {
@@ -1146,13 +1866,45 @@
           aspectRatio: 2,
           scales: {
             y: {
-              min: -100,
-              max: 100,
-              grid: { color: 'rgba(0,0,0,0.1)' }
+              min: yMin,
+              max: yMax,
+              grid: {
+                color: 'rgba(0,0,0,0.1)',
+                drawBorder: false
+              },
+              ticks: {
+                callback: function(value) {
+                  if (value > 5) return '😊 좋음';
+                  if (value > 0) return '🙂 보통';
+                  if (value > -5) return '😐 평범';
+                  return '😔 안좋음';
+                }
+              }
             },
-            x: { grid: { color: 'rgba(0,0,0,0.1)' } }
+            x: {
+              grid: {
+                color: 'rgba(0,0,0,0.05)',
+                drawBorder: false
+              }
+            }
           },
-          plugins: { legend: { display: false } }
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const value = context.parsed.y;
+                  if (value === null) return '데이터 없음';
+                  let emoji = '😐';
+                  if (value > 5) emoji = '😊';
+                  else if (value > 0) emoji = '🙂';
+                  else if (value > -5) emoji = '😐';
+                  else emoji = '😔';
+                  return `${emoji} 기분 점수: ${Math.round(value)}`;
+                }
+              }
+            }
+          }
         }
       });
     }
@@ -1174,6 +1926,16 @@
           : 0;
       });
 
+      // 실제 데이터 범위 확인
+      const validData = weeklyData.filter(d => d !== 0);
+      const hasData = validData.length > 0;
+      const minValue = hasData ? Math.min(...validData) : -10;
+      const maxValue = hasData ? Math.max(...validData) : 10;
+
+      // y축 범위 설정
+      const rMin = Math.min(minValue - 5, -10);
+      const rMax = Math.max(maxValue + 5, 10);
+
       new Chart(ctx, {
         type: 'radar',
         data: {
@@ -1182,12 +1944,13 @@
             label: '요일별 평균 기분',
             data: weeklyData,
             borderColor: '#51cf66',
-            backgroundColor: 'rgba(81, 207, 102, 0.2)',
+            backgroundColor: 'rgba(81, 207, 102, 0.3)',
             borderWidth: 3,
             pointBackgroundColor: '#51cf66',
             pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5
+            pointBorderWidth: 3,
+            pointRadius: 6,
+            pointHoverRadius: 8
           }]
         },
         options: {
@@ -1196,13 +1959,40 @@
           aspectRatio: 1,
           scales: {
             r: {
-              min: -100,
-              max: 100,
-              grid: { color: 'rgba(0,0,0,0.1)' },
-              pointLabels: { font: { size: 12 } }
+              min: rMin,
+              max: rMax,
+              grid: {
+                color: 'rgba(0,0,0,0.1)',
+                circular: true
+              },
+              pointLabels: {
+                font: {
+                  size: 13,
+                  weight: 'bold'
+                }
+              },
+              ticks: {
+                display: true,
+                stepSize: 5
+              }
             }
           },
-          plugins: { legend: { display: false } }
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const value = context.parsed.r;
+                  let emoji = '😐';
+                  if (value > 5) emoji = '😊';
+                  else if (value > 0) emoji = '🙂';
+                  else if (value > -5) emoji = '😐';
+                  else emoji = '😔';
+                  return `${emoji} 평균 기분: ${Math.round(value)}`;
+                }
+              }
+            }
+          }
         }
       });
     }
