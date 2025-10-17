@@ -199,35 +199,54 @@
 
       async function fetchDiaries() {
       try {
+        console.log('🔍 fetchDiaries 시작');
+
         // 세션 확인
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
+        console.log('📋 세션 확인 결과:', {
+          hasSession: !!session,
+          userId: session?.user?.id,
+          sessionError: sessionError
+        });
+
         if (sessionError || !session) {
-          console.error('세션 오류:', sessionError);
+          console.error('❌ 세션 오류:', sessionError);
           alert('로그인이 필요합니다.');
           window.location.href = 'login.html';
           return;
         }
 
-        console.log('현재 사용자 ID:', session.user.id);
+        console.log('✅ 현재 사용자 ID:', session.user.id);
 
         // RLS가 자동으로 현재 사용자의 일기만 가져옴
+        console.log('📡 Supabase에서 일기 조회 시작...');
         const { data, error } = await supabase
           .from('diaries')
           .select('id, content, emotion, created_at')
           .order('created_at', { ascending: false });
 
+        console.log('📡 Supabase 응답:', {
+          dataLength: data?.length,
+          hasError: !!error,
+          error: error
+        });
+
         if (error) {
-          console.error('일기 조회 오류:', error);
+          console.error('❌ 일기 조회 오류:', error);
           alert('일기 불러오기 실패: ' + error.message);
           return;
         }
 
-        console.log('조회된 일기 수:', data?.length || 0);
+        console.log('✅ 조회된 일기 수:', data?.length || 0);
+        if (data && data.length > 0) {
+          console.log('📝 첫 번째 일기:', data[0]);
+        }
+
         diaries = data || [];
         renderDiaries();
       } catch (err) {
-        console.error('예상치 못한 오류:', err);
+        console.error('❌ 예상치 못한 오류:', err);
         alert('일기를 불러오는 중 오류가 발생했습니다.');
         }
       }
