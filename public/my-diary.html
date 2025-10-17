@@ -171,48 +171,68 @@
     import { supabase } from './js/supabase.js';
     import { checkAuth } from './js/auth.js';
 
-    checkAuth();
+    // 페이지 로드 시 실행
+    (async function init() {
+      await checkAuth(); // 인증 확인 먼저
 
-    const diaryList = document.getElementById('diary-list');
-    const emotionFilter = document.getElementById('emotion-filter');
-    const dateFilter = document.getElementById('date-filter');
+      const diaryList = document.getElementById('diary-list');
+      const emotionFilter = document.getElementById('emotion-filter');
+      const dateFilter = document.getElementById('date-filter');
 
-    const emotionMap = {
-      happy: '😊 행복',
-      sad: '😢 슬픔',
-      angry: '😠 분노',
-      anxious: '😟 불안',
-      neutral: '😐 보통'
-    };
+      const emotionMap = {
+        happy: '😊 행복',
+        sad: '😢 슬픔',
+        angry: '😠 분노',
+        anxious: '😟 불안',
+        neutral: '😐 보통'
+      };
 
-    const colorClassMap = {
-      happy: 'color-happy',
-      sad: 'color-sad',
-      angry: 'color-angry',
-      anxious: 'color-anxious',
-      neutral: 'color-neutral'
-    };
+      const colorClassMap = {
+        happy: 'color-happy',
+        sad: 'color-sad',
+        angry: 'color-angry',
+        anxious: 'color-anxious',
+        neutral: 'color-neutral'
+      };
 
-    let diaries = [];
+      let diaries = [];
 
-    async function fetchDiaries() {
-      const { data: { user } } = await supabase.auth.getUser();
-      const { data, error } = await supabase
-        .from('diaries')
-        .select('id, content, emotion, created_at')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      async function fetchDiaries() {
+      try {
+        // 세션 확인
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-      if (error) {
-        alert('일기 불러오기 실패: ' + error.message);
-        return;
+        if (sessionError || !session) {
+          console.error('세션 오류:', sessionError);
+          alert('로그인이 필요합니다.');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        console.log('현재 사용자 ID:', session.user.id);
+
+        // RLS가 자동으로 현재 사용자의 일기만 가져옴
+        const { data, error } = await supabase
+          .from('diaries')
+          .select('id, content, emotion, created_at')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('일기 조회 오류:', error);
+          alert('일기 불러오기 실패: ' + error.message);
+          return;
+        }
+
+        console.log('조회된 일기 수:', data?.length || 0);
+        diaries = data || [];
+        renderDiaries();
+      } catch (err) {
+        console.error('예상치 못한 오류:', err);
+        alert('일기를 불러오는 중 오류가 발생했습니다.');
+        }
       }
 
-      diaries = data;
-      renderDiaries();
-    }
-
-    function renderDiaries() {
+      function renderDiaries() {
       const selectedEmotion = emotionFilter.value;
       const selectedDate = dateFilter.value;
 
@@ -286,19 +306,20 @@
         `;
 
         diaryList.appendChild(card);
-      });
-    }
+        });
+      }
 
-    emotionFilter.addEventListener('change', renderDiaries);
-    dateFilter.addEventListener('change', renderDiaries);
+      emotionFilter.addEventListener('change', renderDiaries);
+      dateFilter.addEventListener('change', renderDiaries);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const initialEmotion = urlParams.get('emotion');
-    if (initialEmotion) {
-      emotionFilter.value = initialEmotion;
-    }
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialEmotion = urlParams.get('emotion');
+      if (initialEmotion) {
+        emotionFilter.value = initialEmotion;
+      }
 
-    fetchDiaries();
+      fetchDiaries();
+    })(); // init 함수 즉시 실행
   </script>
 
 </body>
