@@ -252,14 +252,24 @@
       }
 
       function renderDiaries() {
+      console.log('🎨 renderDiaries 시작');
+      console.log('📊 전체 일기 수:', diaries.length);
+
       const selectedEmotion = emotionFilter.value;
       const selectedDate = dateFilter.value;
+
+      console.log('🔍 필터 설정:', {
+        selectedEmotion,
+        selectedDate
+      });
 
       const filtered = diaries.filter(d => {
         const emotionMatch = selectedEmotion === 'all' || d.emotion === selectedEmotion;
         const dateMatch = !selectedDate || d.created_at.startsWith(selectedDate);
         return emotionMatch && dateMatch;
       });
+
+      console.log('✅ 필터링된 일기 수:', filtered.length);
 
       diaryList.innerHTML = '';
 
@@ -278,7 +288,11 @@
         return;
       }
 
+      console.log('🔨 카드 생성 시작');
+
       filtered.forEach((diary, index) => {
+        console.log(`📝 카드 ${index + 1}/${filtered.length} 생성 중:`, diary.id);
+
         const card = document.createElement('div');
         card.className = `emotion-card rounded-2xl p-6 shadow-lg animate-slide-up emotion-${diary.emotion}`;
         card.style.animationDelay = `${index * 0.1}s`;
@@ -325,7 +339,10 @@
         `;
 
         diaryList.appendChild(card);
+        console.log(`✅ 카드 ${index + 1} DOM에 추가 완료`);
         });
+
+      console.log('🎉 renderDiaries 완료');
       }
 
       emotionFilter.addEventListener('change', renderDiaries);
