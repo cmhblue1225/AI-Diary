@@ -369,6 +369,29 @@ Build settings:
      - `emotion-prediction.js` (Netlify Function)
    - **결과**: 깔끔한 단일 일기 작성 인터페이스로 전환
 
+#### 7. **my-diary.html 일기 목록 표시 버그 수정** ✅ 완료 (2025-10-18)
+   - **증상**: 일기가 작성되고 DB에 저장되지만 my-diary.html에 표시되지 않음
+   - **문제 진단**:
+     - 237개 일기가 DB에 정상 저장됨 확인
+     - 237개 카드가 DOM에 정상 추가됨 확인 (document.querySelectorAll 검증)
+     - 카드 스타일 정상 (display: block, opacity: 1, visibility: visible)
+   - **근본 원인**: `animate-slide-up` 애니메이션 클래스 문제
+     - 애니메이션이 `opacity: 0`에서 시작
+     - 235개 카드에 각각 `animationDelay = ${index * 0.1}s` 적용
+     - 누적 delay로 마지막 카드는 23.5초 후에 표시
+     - 사용자가 스크롤을 내리지 않아 첫 화면만 확인
+   - **해결 방법**:
+     - `animate-slide-up` 클래스 제거
+     - `card.style.opacity = '1'`로 즉시 표시되도록 설정
+     - 디버깅 로그 모두 제거 (프로덕션 코드 정리)
+   - **검증**:
+     - 237개 카드 모두 즉시 표시 확인
+     - 최신순 정렬 정상 작동 (created_at DESC)
+     - 감정 필터 및 날짜 필터 정상 작동
+   - **커밋**:
+     - `ddd799b`: "Fix: Remove animation delay to show diary cards immediately"
+     - `[현재]`: "Clean: Remove debugging logs from my-diary.html"
+
 ### 2025년 9월 이전 업데이트
 1. **네비게이션 및 UI 통일성 완성**
    - 모든 19개 페이지 상단 네비게이션으로 통일
